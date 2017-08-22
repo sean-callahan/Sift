@@ -1,0 +1,23 @@
+﻿<Window x:Class="Sift.Client.ErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Sift.Client"
+        mc:Ignorable="d"
+        Title="Sift Error" Height="300" Width="500"  Background="#FF252525">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Name="Heading" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" FontSize="16" />
+        <Border Grid.Row="1" Margin="5" BorderThickness="1" BorderBrush="#FF333333">
+            <ScrollViewer >
+                <TextBlock Name="Detail" TextWrapping="Wrap" Foreground="Gray" Background="#FF222222" />
+            </ScrollViewer>
+        </Border>
+        <Button Name="CloseButton" Grid.Row="2" Width="70" HorizontalAlignment="Right" Margin="5" Click="CloseButton_Click">Close</Button>
+    </Grid>
+</Window>

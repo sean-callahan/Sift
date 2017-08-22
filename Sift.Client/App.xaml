@@ -1,0 +1,31 @@
+﻿<Application x:Class="Sift.Client.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Sift.Client"
+             Startup="App_Startup">
+    <Application.Resources>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="#FF515151" />
+            <Setter Property="BorderBrush" Value="#FF424242" />
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
+        <Style TargetType="{x:Type PasswordBox}">
+            <Setter Property="Background" Value="#FF515151" />
+            <Setter Property="BorderBrush" Value="#FF424242" />
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
+        <Style  x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="Background" Value="#FF515151" />
+            <Setter Property="BorderBrush" Value="#FF424242" />
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#FF515151" />
+            <Setter Property="BorderBrush" Value="#FF424242" />
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
+    </Application.Resources>
+</Application>
