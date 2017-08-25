@@ -23,8 +23,8 @@
             <Viewbox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" >
                 <Label x:Name="CallerName" FontWeight="Bold" Foreground="#FF111111" FontSize="18"/>
             </Viewbox>
-            <Viewbox Grid.Column="2" Grid.Row="0" HorizontalAlignment="Right" >
-                <Label x:Name="CallerLocation" Grid.Column="1" Grid.Row="0" Foreground="#FF111111" FontSize="16" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+            <Viewbox Grid.Column="2" Grid.Row="0" HorizontalAlignment="Right">
+                <Label x:Name="CallerLocation" Grid.Column="1" Grid.Row="0" Foreground="#FF111111" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
             </Viewbox>
             <Viewbox Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2"  HorizontalAlignment="Left"  >
                 <TextBlock TextWrapping="Wrap" x:Name="Comment"  Margin="5" Foreground="#FF111111" HorizontalAlignment="Left" />

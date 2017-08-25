@@ -8,5 +8,9 @@
         LoginRequest,
         RequestDump,
         RequestScreen,
+        RequestHold,
+        RequestLine,
+
+        ErrorPacket,
     }
 }

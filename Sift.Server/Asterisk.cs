@@ -17,8 +17,9 @@ namespace Sift.Server
         public event EventHandler<Screener> ScreenerStart;
         public event EventHandler<Screener> ScreenerEnd;
 
+        public bool Connected => Client.Connected;
+
         public AriClient Client { get; }
-        public AsteriskLink ActiveLink { get; set; }
 
         private Dictionary<string, Caller> callerRegistry = new Dictionary<string, Caller>();
         public Dictionary<string, Screener> ScreenerRegistry = new Dictionary<string, Screener>();
@@ -47,6 +48,7 @@ namespace Sift.Server
                 case StasisArgs.Caller:
                     Caller c = new Caller(e.Channel.Id);
                     c.Number = e.Channel.Caller.Number;
+                    c.Created = e.Channel.Creationtime;
                     CallerStart?.Invoke(this, c);
                     callerRegistry[e.Channel.Id] = c;
                     break;
@@ -78,14 +80,14 @@ namespace Sift.Server
             }
         }
 
-        public void Ring(Caller c)
+        public void Ring(string channelId)
         {
-            Client.Channels.Ring(c.Id);
+            Client.Channels.Ring(channelId);
         }
 
-        public void Hangup(Caller c)
+        public void Hangup(string channelId)
         {
-            Client.Channels.Hangup(c.Id);
+            Client.Channels.Hangup(channelId);
         }
 
         public void Call(Caller from, string number)
@@ -94,7 +96,7 @@ namespace Sift.Server
             Client.Channels.Originate(number, app: "hello-world", appArgs: ((int)StasisArgs.Screener).ToString(), callerId: from.Number);
         }
 
-        public void Busy(Caller c)
+        public void Busy(string channelId)
         {
         }
 

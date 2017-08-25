@@ -1,4 +1,6 @@
-﻿using Sift.Common;
+﻿using System;
+
+using Sift.Common;
 using Sift.Common.Network;
 
 namespace Sift.Server
@@ -20,12 +22,11 @@ namespace Sift.Server
             if (line.Caller == null)
                 return;
 
+            line.State = e.State;
             line.Caller.Name = e.Name;
             line.Caller.Location = e.Location;
             line.Caller.Comment = e.Comment;
-
-            if (line.State == LineState.Screening)
-                line.State = LineState.Hold;
+            line.Caller.Created = new DateTime().AddSeconds(e.Created);
 
             Program.Server.Broadcast(new UpdateLineState(line));
         }

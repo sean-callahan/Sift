@@ -10,10 +10,12 @@ namespace Sift.Common
         event EventHandler<Screener> ScreenerStart;
         event EventHandler<Screener> ScreenerEnd;
 
+        bool Connected { get; }
+
         void Call(Caller from, string number);
         void Connect();
-        void Ring(Caller c);
-        void Busy(Caller c);
-        void Hangup(Caller c);
+        void Ring(string channelId);
+        void Busy(string channelId);
+        void Hangup(string channelId);
     }
 }

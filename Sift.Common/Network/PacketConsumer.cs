@@ -6,8 +6,6 @@ namespace Sift.Common.Network
 {
     public abstract class PacketConsumer
     {
-        public event EventHandler<Exception> Error;
-
         protected abstract NetPeer Peer { get; }
 
         public void ReadMessages(object sender, EventArgs e)
@@ -20,7 +18,6 @@ namespace Sift.Common.Network
                     switch (im.MessageType)
                     {
                         case NetIncomingMessageType.StatusChanged:
-
                             break;
                         case NetIncomingMessageType.Data:
                             PacketType type = (PacketType)im.ReadByte();
@@ -30,7 +27,7 @@ namespace Sift.Common.Network
                             }
                             catch (Exception ex)
                             {
-                                Error?.Invoke(this, ex);
+                                Error?.Invoke(this, new ErrorPacket(ex));
                             }
                             break;
                         default:
@@ -61,6 +58,15 @@ namespace Sift.Common.Network
                 case PacketType.RequestScreen:
                     RequestScreen?.Invoke(msg.SenderConnection, new RequestScreen(msg));
                     break;
+                case PacketType.RequestHold:
+                    RequestHold?.Invoke(msg.SenderConnection, new RequestHold(msg));
+                    break;
+                case PacketType.RequestLine:
+                    RequestLine?.Invoke(msg.SenderConnection, new RequestLine(msg));
+                    break;
+                case PacketType.ErrorPacket:
+                    Error?.Invoke(msg.SenderConnection, new ErrorPacket(msg));
+                    break;
             }
         }
 
@@ -69,5 +75,8 @@ namespace Sift.Common.Network
         public event EventHandler<LoginRequest> LoginRequest;
         public event EventHandler<RequestDump> RequestDump;
         public event EventHandler<RequestScreen> RequestScreen;
+        public event EventHandler<RequestHold> RequestHold;
+        public event EventHandler<RequestLine> RequestLine;
+        public event EventHandler<ErrorPacket> Error;
     }
 }

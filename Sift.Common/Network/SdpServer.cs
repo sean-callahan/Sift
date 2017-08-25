@@ -31,6 +31,8 @@ namespace Sift.Common.Network
 
         public void Send(NetConnection conn, IPacket packet)
         {
+            if (packet == null)
+                return;
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);

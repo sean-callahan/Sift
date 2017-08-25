@@ -8,12 +8,12 @@ namespace Sift.Client
     /// </summary>
     public partial class ErrorWindow : Window
     {
-        public ErrorWindow(Exception e)
+        public ErrorWindow(string message, string stackTrace)
         {
             InitializeComponent();
 
-            Heading.Content = e.Message;
-            Detail.Text = e.Source + "\n" + e.StackTrace;
+            Heading.Content = message;
+            Detail.Text = stackTrace;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

@@ -2,6 +2,7 @@
 
 using AsterNET.ARI.Models;
 using Sift.Common;
+using Sift.Common.Network;
 
 namespace Sift.Server
 {
@@ -20,6 +21,11 @@ namespace Sift.Server
 
         public AsteriskLink(Program program, Asterisk asterisk, Caller c)
         {
+            if (program.LinkedCallers.ContainsKey(c))
+                program.LinkedCallers[c].Dispose();
+
+            program.LinkedCallers[c] = this;
+
             Id = Guid.NewGuid();
             Caller = c;
 
@@ -74,7 +80,6 @@ namespace Sift.Server
                 return;
             try
             {
-                asterisk.Client.Channels.Ring(Caller.Id);
                 asterisk.Client.Bridges.RemoveChannel(bridge.Id, e.Id);
                 asterisk.Client.Bridges.RemoveChannel(bridge.Id, Caller.Id);
             }
@@ -89,12 +94,20 @@ namespace Sift.Server
 
         public void Dispose()
         {
-            foreach (string cid in bridge.Channels)
-                asterisk.Client.Bridges.RemoveChannel(bridge.Id, cid);
-            asterisk.Client.Bridges.Destroy(bridge.Id);
-            asterisk.ActiveLink = null;
-            if (!ended)
-                End?.Invoke(this, null);
+            try
+            {
+                foreach (string cid in bridge.Channels)
+                    asterisk.Client.Bridges.RemoveChannel(bridge.Id, cid);
+                asterisk.Client.Bridges.Destroy(bridge.Id);
+                program.LinkedCallers.Remove(Caller);
+                Console.WriteLine("bridge: " + Id + " destroyed");
+                if (!ended)
+                    End?.Invoke(this, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }

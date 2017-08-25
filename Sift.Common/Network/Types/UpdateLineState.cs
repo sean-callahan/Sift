@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Sift.Common.Util;
+
 using Lidgren.Network;
 
 namespace Sift.Common.Network
@@ -13,6 +15,7 @@ namespace Sift.Common.Network
         public string Name;
         public string Location;
         public string Comment;
+        public long Created;
 
         public PacketType Type => PacketType.UpdateLineState;
 
@@ -27,6 +30,8 @@ namespace Sift.Common.Network
             Name = line.Caller?.Name;
             Location = line.Caller?.Location;
             Comment = line.Caller?.Comment;
+            if (line.Caller != null)
+                Created = line.Caller.Created.ToTimestamp();
         }
 
         public UpdateLineState(NetIncomingMessage msg) => Decode(msg);
@@ -40,6 +45,7 @@ namespace Sift.Common.Network
             Name = msg.ReadString();
             Location = msg.ReadString();
             Comment = msg.ReadString();
+            Created = msg.ReadInt64();
         }
 
         public void Encode(NetOutgoingMessage msg)
@@ -51,6 +57,7 @@ namespace Sift.Common.Network
             msg.Write(Name);
             msg.Write(Location);
             msg.Write(Comment);
+            msg.Write(Created);
         }
     }
 }

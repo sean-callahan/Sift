@@ -29,6 +29,8 @@ namespace Sift.Client
             Client = client;
             Client.UpdateLineState += Client_UpdateLineState;
 
+            Client.Send(new RequestLine(-1)); // request all lines
+
             InitializeComponent();
 
             Screener = new ScreenerElement(Client);

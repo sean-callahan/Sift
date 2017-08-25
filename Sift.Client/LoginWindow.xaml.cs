@@ -21,7 +21,7 @@ namespace Sift.Client
             InitializeComponent();
         }
 
-        private void Client_Error(object sender, Exception e) => App.ShowError(e);
+        private void Client_Error(object sender, ErrorPacket e) => App.ShowError(e.Message, e.StackTrace);
 
         private void Client_UpdateAppState(object sender, UpdateAppState e)
         {
@@ -35,7 +35,6 @@ namespace Sift.Client
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Connected: " + Client.Connected + "\nPort:" + Client.Client.Port);
             Client.Send(new LoginRequest());
         }
     }

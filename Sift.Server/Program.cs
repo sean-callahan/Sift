@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Threading.Tasks;
 using Sift.Common;
 using Sift.Common.Network;
 
@@ -18,13 +18,24 @@ namespace Sift.Server
                 $" /___/___/_/   /_/     Server Version {Version}\n";
             Console.WriteLine(motd);
 
-            Program p = new Program(new Asterisk("10.199.1.172", 8088, "asterisk", "asterisk", "hello-world"), 8);
-            p.Process();
+            try
+            {
+                Program p = new Program(new Asterisk("10.199.1.172", 8088, "asterisk", "asterisk", "hello-world"), 8);
+                p.Connect();
+                p.Process();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.ReadLine();
+            }
         }
 
         public IVoipProvider Provider { get; }
         public IReadOnlyList<Line> Lines { get; }
-        public AsteriskGroup HoldGroup { get; }
+
+        public AsteriskGroup HoldGroup { get; private set; }
+        public Dictionary<Caller, AsteriskLink> LinkedCallers { get; } = new Dictionary<Caller, AsteriskLink>(); 
 
         public SdpServer Server { get; }
 
@@ -39,17 +50,35 @@ namespace Sift.Server
 
             Lines = lines;
             Provider = provider;
-            HoldGroup = new AsteriskGroup(provider, GroupType.Holding);
 
             provider.CallerStart += Provider_CallerStart;
             provider.CallerEnd += Provider_CallerEnd;
-            provider.Connect();
-
+            
             Server = new SdpServer(7282);
             Server.Start();
 
             new RequestManager(this);
             new UpdateManager(this);
+        }
+
+        public async void Connect()
+        {
+            Console.WriteLine("Trying to connect to Asterisk server...");
+
+            Provider.Connect();
+
+            int tries = 0;
+            while (!Provider.Connected)
+            {
+                tries++;
+                if (tries > 40)
+                    throw new Exception("could not connect to Asterisk");
+                await Task.Delay(250);
+            }
+
+            Console.WriteLine("Connected to Asterisk server");
+
+            HoldGroup = new AsteriskGroup(Provider, GroupType.Holding);
         }
 
         public void Process()
@@ -91,7 +120,7 @@ namespace Sift.Server
             if (next < 0)
             {
                 Console.WriteLine("denying caller: lines are full");
-                Provider.Hangup(c);
+                Provider.Hangup(c.Id);
                 return;
             }
 
@@ -101,7 +130,7 @@ namespace Sift.Server
 
             Console.WriteLine("caller: assigning index " + next);
 
-            Provider.Ring(c);
+            Provider.Ring(c.Id);
 
             Server.Broadcast(new UpdateLineState(line));
         }

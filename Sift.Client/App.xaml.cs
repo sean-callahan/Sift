@@ -40,9 +40,9 @@ namespace Sift.Client
             new LoginWindow(Client).Show();
         }
 
-        public static void ShowError(Exception e)
+        public static void ShowError(string msg, string stackTrace)
         {
-            new ErrorWindow(e).Show();
+            new ErrorWindow(msg, stackTrace).Show();
         }
     }
 }

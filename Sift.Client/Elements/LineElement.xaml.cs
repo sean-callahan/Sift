@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
+using System.Windows.Threading;
 using Sift.Common;
 using Sift.Common.Network;
 
@@ -32,10 +33,15 @@ namespace Sift.Client.Elements
 
         private MainWindow parent;
         private bool showingBorder = false;
+        private DateTime created;
+        private DispatcherTimer durationUpdater = new DispatcherTimer();
 
         public LineElement(MainWindow parent, Line line)
         {
             InitializeComponent();
+
+            durationUpdater.Tick += DurationUpdater_Tick;
+            durationUpdater.Interval = new TimeSpan(0, 0, 1);
 
             this.parent = parent;
             Line = line;
@@ -46,6 +52,14 @@ namespace Sift.Client.Elements
             }
 
             Update();
+
+            durationUpdater.Start();
+        }
+
+        private void DurationUpdater_Tick(object sender, EventArgs e)
+        {
+            if (created != DateTime.MinValue)
+                Duration.Content = (DateTime.Now - created).ToString("c");
         }
 
         public void Update()
@@ -61,7 +75,9 @@ namespace Sift.Client.Elements
             CallerName.Content = string.IsNullOrWhiteSpace(Line.Caller.Name) ? Line.Caller.Number : Line.Caller.Name;
             CallerLocation.Content = Line.Caller.Location;
             Comment.Text = Line.Caller.Comment;
-            Duration.Content = "";
+            created = Line.Caller.Created;
+            if (!durationUpdater.IsEnabled)
+                durationUpdater.Start();
         }
 
         public void Clear()
@@ -70,6 +86,7 @@ namespace Sift.Client.Elements
             CallerName.Content = "";
             CallerLocation.Content = "";
             Comment.Text = "";
+            durationUpdater.Stop();
             Duration.Content = "";
         }
 
