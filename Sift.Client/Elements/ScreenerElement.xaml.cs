@@ -65,7 +65,8 @@ namespace Sift.Client.Elements
 
             client.Send(new UpdateLineState(line));
 
-            client.Send(new RequestHold(line.Index));
+            if (line.State == LineState.Screening)
+                client.Send(new RequestHold(line.Index));
         }
     }
 }

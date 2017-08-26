@@ -36,7 +36,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" Content="AIR" Background="#2574A9" />
+                <Button Name="Air" Grid.Row="0" Grid.Column="0" Content="AIR" Background="#2574A9" Click="Air_Click" />
                 <Button x:Name="ScreenToggle" Grid.Row="1" Grid.Column="0" Content="SCREEN" Background="#2574A9" Click="ScreenToggle_Click" />
                 <Button Name="Dump" Grid.Row="2" Grid.Column="0" Content="HANGUP" Background="#2574A9" Click="Dump_Click" />
             </Grid>

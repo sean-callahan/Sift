@@ -10,6 +10,7 @@
         RequestScreen,
         RequestHold,
         RequestLine,
+        RequestAir,
 
         ErrorPacket,
     }

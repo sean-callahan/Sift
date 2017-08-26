@@ -64,6 +64,9 @@ namespace Sift.Common.Network
                 case PacketType.RequestLine:
                     RequestLine?.Invoke(msg.SenderConnection, new RequestLine(msg));
                     break;
+                case PacketType.RequestAir:
+                    RequestAir?.Invoke(msg.SenderConnection, new RequestAir(msg));
+                    break;
                 case PacketType.ErrorPacket:
                     Error?.Invoke(msg.SenderConnection, new ErrorPacket(msg));
                     break;
@@ -77,6 +80,7 @@ namespace Sift.Common.Network
         public event EventHandler<RequestScreen> RequestScreen;
         public event EventHandler<RequestHold> RequestHold;
         public event EventHandler<RequestLine> RequestLine;
+        public event EventHandler<RequestAir> RequestAir;
         public event EventHandler<ErrorPacket> Error;
     }
 }

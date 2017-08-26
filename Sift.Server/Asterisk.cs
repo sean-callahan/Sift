@@ -14,17 +14,17 @@ namespace Sift.Server
         public event EventHandler<Caller> CallerStart;
         public event EventHandler<Caller> CallerEnd;
 
-        public event EventHandler<Screener> ScreenerStart;
-        public event EventHandler<Screener> ScreenerEnd;
+        public event EventHandler<Destination> DestinationStart;
+        public event EventHandler<Destination> DestinationEnd;
 
         public bool Connected => Client.Connected;
 
         public AriClient Client { get; }
 
         private Dictionary<string, Caller> callerRegistry = new Dictionary<string, Caller>();
-        public Dictionary<string, Screener> ScreenerRegistry = new Dictionary<string, Screener>();
+        public Dictionary<string, Destination> DestinationRegistry = new Dictionary<string, Destination>();
 
-        private Dictionary<Guid, Group> groupRegistry = new Dictionary<Guid, Group>();
+        private Dictionary<Guid, IGroup> groupRegistry = new Dictionary<Guid, IGroup>();
 
         public Asterisk(string addr, int port, string user, string secret, string app)
         {
@@ -54,10 +54,10 @@ namespace Sift.Server
                     break;
                 case StasisArgs.Screener:
                     string name = e.Channel.Name;
-                    Screener s = new Screener(name.Substring(0, name.IndexOf('-')));
+                    Destination s = new Destination(name.Substring(0, name.IndexOf('-')));
                     s.Id = e.Channel.Id;
-                    ScreenerStart?.Invoke(this, s);
-                    ScreenerRegistry[e.Channel.Id] = s;
+                    DestinationStart?.Invoke(this, s);
+                    DestinationRegistry[e.Channel.Id] = s;
                     break;
                 default:
                     throw new NotSupportedException("Stasis argument unsupported");
@@ -72,10 +72,10 @@ namespace Sift.Server
                 callerRegistry.Remove(e.Channel.Id);
                 return;
             }
-            if (ScreenerRegistry.ContainsKey(e.Channel.Id))
+            if (DestinationRegistry.ContainsKey(e.Channel.Id))
             {
-                ScreenerEnd?.Invoke(this, ScreenerRegistry[e.Channel.Id]);
-                ScreenerRegistry.Remove(e.Channel.Id);
+                DestinationEnd?.Invoke(this, DestinationRegistry[e.Channel.Id]);
+                DestinationRegistry.Remove(e.Channel.Id);
                 return;
             }
         }

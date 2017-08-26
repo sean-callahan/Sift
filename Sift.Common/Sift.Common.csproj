@@ -45,9 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Group.cs" />
+    <Compile Include="IGroup.cs" />
     <Compile Include="Caller.cs" />
     <Compile Include="GroupType.cs" />
+    <Compile Include="IDestination.cs" />
+    <Compile Include="ILink.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="LineState.cs" />
     <Compile Include="Network\SdpClient.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="Network\SdpServer.cs" />
     <Compile Include="Network\Types\ErrorPacket.cs" />
     <Compile Include="Network\Types\LoginRequest.cs" />
+    <Compile Include="Network\Types\RequestAir.cs" />
     <Compile Include="Network\Types\RequestDump.cs" />
     <Compile Include="Network\Types\RequestHold.cs" />
     <Compile Include="Network\Types\RequestLine.cs" />
@@ -65,7 +68,7 @@
     <Compile Include="Network\Types\UpdateAppState.cs" />
     <Compile Include="Network\Types\UpdateLineState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Screener.cs" />
+    <Compile Include="Destination.cs" />
     <Compile Include="IVoipProvider.cs" />
     <Compile Include="Util\DateTimeExtensions.cs" />
   </ItemGroup>

@@ -7,8 +7,8 @@ namespace Sift.Common
         event EventHandler<Caller> CallerStart;
         event EventHandler<Caller> CallerEnd;
 
-        event EventHandler<Screener> ScreenerStart;
-        event EventHandler<Screener> ScreenerEnd;
+        event EventHandler<Destination> DestinationStart;
+        event EventHandler<Destination> DestinationEnd;
 
         bool Connected { get; }
 

@@ -5,14 +5,23 @@ using Sift.Common;
 
 namespace Sift.Server
 {
-    public class AsteriskGroup : Group
+    public class AsteriskGroup : IGroup
     {
+        public Guid Id { get; }
+
+        public IVoipProvider Provider { get; }
+
+        public GroupType Type { get; }
+
         private Asterisk asterisk;
         private Bridge bridge;
 
-        public AsteriskGroup(IVoipProvider provider, GroupType type) : base(provider, type)
+        public AsteriskGroup(IVoipProvider provider, GroupType type)
         {
             Id = Guid.NewGuid();
+            Provider = provider;
+            Type = type;
+
             asterisk = ((Asterisk)provider);
 
             string bridgeType;
@@ -30,14 +39,17 @@ namespace Sift.Server
             }
             
             bridge = asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), Asterisk.AppName);
-        }
 
-        public override void Add(Caller c)
+            if (type == GroupType.Holding)
+                asterisk.Client.Bridges.StartMoh(bridge.Id, "default");
+        }
+        
+        public void Add(Caller c)
         {
             asterisk.Client.Bridges.AddChannel(bridge.Id, c.Id);
         }
 
-        public override void Remove(Caller c)
+        public void Remove(Caller c)
         {
             asterisk.Client.Bridges.RemoveChannel(bridge.Id, c.Id);
         }

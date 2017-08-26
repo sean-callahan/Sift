@@ -16,7 +16,22 @@ namespace Sift.Server
             Program.Server.RequestDump += Server_RequestDump;
             Program.Server.RequestScreen += Server_RequestScreen;
             Program.Server.RequestHold += Server_RequestHold;
-            Program.Server.RequestLine += Server_RequestLine; ;
+            Program.Server.RequestLine += Server_RequestLine;
+            Program.Server.RequestAir += Server_RequestAir;
+        }
+
+        private void Server_RequestAir(object sender, RequestAir e)
+        {
+            Line line = Program.Lines[e.Index];
+
+            if (line == null || line.Caller == null || Program.LinkedCallers.ContainsKey(line.Caller))
+                return;
+
+            AsteriskLink link = new AsteriskLink(Program, (Asterisk)Program.Provider, Program.Lines[e.Index].Caller, "2001");
+            link.Start();
+
+            line.State = LineState.OnAir;
+            Program.Server.Broadcast(new UpdateLineState(line));
         }
 
         private void Server_RequestLine(object sender, RequestLine e)
@@ -32,7 +47,7 @@ namespace Sift.Server
 
         private void Server_RequestHold(object sender, RequestHold e)
         {
-            AsteriskLink link;
+            ILink link;
             if (!Program.LinkedCallers.TryGetValue(Program.Lines[e.Index].Caller, out link))
                 return;
             link.Dispose();
@@ -53,8 +68,8 @@ namespace Sift.Server
             line.State = LineState.Screening;
             Program.Server.Broadcast(new UpdateLineState(line));
 
-            AsteriskLink link = new AsteriskLink(Program, (Asterisk)Program.Provider, Program.Lines[e.Index].Caller);
-            link.Dial("2002");
+            AsteriskLink link = new AsteriskLink(Program, (Asterisk)Program.Provider, Program.Lines[e.Index].Caller, "2002");
+            link.Start();
         }
 
         private void Server_RequestDump(object sender, RequestDump e)
@@ -64,7 +79,7 @@ namespace Sift.Server
 
         private void Server_LoginRequest(object sender, LoginRequest e)
         {
-            Program.Server.Send((NetConnection)sender, new UpdateAppState(8));
+            Program.Server.Send((NetConnection)sender, new UpdateAppState(Program.Lines.Count));
         }
     }
 }

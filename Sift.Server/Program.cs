@@ -34,8 +34,8 @@ namespace Sift.Server
         public IVoipProvider Provider { get; }
         public IReadOnlyList<Line> Lines { get; }
 
-        public AsteriskGroup HoldGroup { get; private set; }
-        public Dictionary<Caller, AsteriskLink> LinkedCallers { get; } = new Dictionary<Caller, AsteriskLink>(); 
+        public IGroup HoldGroup { get; private set; }
+        public Dictionary<Caller, ILink> LinkedCallers { get; } = new Dictionary<Caller, ILink>(); 
 
         public SdpServer Server { get; }
 

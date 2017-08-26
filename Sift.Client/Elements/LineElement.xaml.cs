@@ -147,5 +147,12 @@ namespace Sift.Client.Elements
                 return;
             parent.Client.Send(new RequestScreen(Line.Index));
         }
+
+        private void Air_Click(object sender, RoutedEventArgs e)
+        {
+            if (Line == null || Line.Caller == null)
+                return;
+            parent.Client.Send(new RequestAir(Line.Index));
+        }
     }
 }

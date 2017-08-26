@@ -2,24 +2,26 @@
 
 using AsterNET.ARI.Models;
 using Sift.Common;
-using Sift.Common.Network;
 
 namespace Sift.Server
 {
-    internal class AsteriskLink : IDisposable
+    internal class AsteriskLink : IProviderLink<Asterisk>, IDisposable
     {
         public Guid Id { get; }
-        public Caller Caller { get; }
-        public Screener Screener { get; private set; }
+
+        public Asterisk Provider { get; }
+
+        public Caller Originator { get; }
+
+        public IDestination Destination { get; }
 
         private Program program;
-        private Asterisk asterisk;
         private Bridge bridge;
 
         private bool ended = false;
         public event EventHandler End;
 
-        public AsteriskLink(Program program, Asterisk asterisk, Caller c)
+        public AsteriskLink(Program program, Asterisk asterisk, Caller c, string exten)
         {
             if (program.LinkedCallers.ContainsKey(c))
                 program.LinkedCallers[c].Dispose();
@@ -27,67 +29,66 @@ namespace Sift.Server
             program.LinkedCallers[c] = this;
 
             Id = Guid.NewGuid();
-            Caller = c;
-
-            this.asterisk = asterisk;
+            Provider = asterisk;
+            Originator = c;
+            Destination = new Destination(exten);
+            
             this.program = program;
 
             bridge = asterisk.Client.Bridges.Create("mixing", Id.ToString(), Asterisk.AppName);
         }
 
-        public void Dial(string exten)
+        public void Start()
         {
-            Screener = new Screener(exten);
-
-            asterisk.Call(Caller, exten);
-            asterisk.ScreenerStart += Asterisk_ScreenerStart;
+            Provider.Call(Originator, Destination.EndPoint);
+            Provider.DestinationStart += Asterisk_ScreenerStart;
         }
 
-        private void Asterisk_ScreenerStart(object sender, Screener e)
+        private void Asterisk_ScreenerStart(object sender, Destination e)
         {
-            if (Screener == null || e.Extension != "SIP/"+Screener.Extension)
+            if (Destination == null || e.EndPoint != "SIP/" + Destination.EndPoint)
                 return;
 
-            Screener.Id = e.Id;
-            asterisk.Client.Bridges.AddChannel(bridge.Id, e.Id);
+            Destination.Id = e.Id;
+            Provider.Client.Bridges.AddChannel(bridge.Id, e.Id);
 
             Console.WriteLine("Screener start " + e.Id);
 
-            asterisk.Client.Channels.Answer(Caller.Id);
-            asterisk.Client.Bridges.AddChannel(bridge.Id, Caller.Id);
+            Provider.Client.Channels.Answer(Originator.Id);
+            Provider.Client.Bridges.AddChannel(bridge.Id, Originator.Id);
 
-            asterisk.ScreenerEnd += Asterisk_ScreenerEnd;
-            asterisk.CallerEnd += Asterisk_CallerEnd;
-            asterisk.ScreenerStart -= Asterisk_ScreenerStart;
+            Provider.DestinationEnd += Asterisk_ScreenerEnd;
+            Provider.CallerEnd += Asterisk_CallerEnd;
+            Provider.DestinationStart -= Asterisk_ScreenerStart;
         }
 
         private void Asterisk_CallerEnd(object sender, Caller e)
         {
             try
             {
-                asterisk.Client.Channels.Hangup(Screener.Id);
+                Provider.Client.Channels.Hangup(Destination.Id);
             }
             catch (Exception)
             {
 
             }
-            asterisk.CallerEnd -= Asterisk_CallerEnd;
+            Provider.CallerEnd -= Asterisk_CallerEnd;
         }
 
-        private void Asterisk_ScreenerEnd(object sender, Screener e)
+        private void Asterisk_ScreenerEnd(object sender, Destination e)
         {
-            if (e.Extension != "SIP/" + Screener.Extension)
+            if (e.EndPoint != "SIP/" + Destination.EndPoint)
                 return;
             try
             {
-                asterisk.Client.Bridges.RemoveChannel(bridge.Id, e.Id);
-                asterisk.Client.Bridges.RemoveChannel(bridge.Id, Caller.Id);
+                Provider.Client.Bridges.RemoveChannel(bridge.Id, e.Id);
+                Provider.Client.Bridges.RemoveChannel(bridge.Id, Originator.Id);
             }
             catch (Exception)
             {
             }
 
-            asterisk.ScreenerEnd -= Asterisk_ScreenerEnd;
+            Provider.DestinationEnd -= Asterisk_ScreenerEnd;
 
             Dispose();
         }
@@ -97,9 +98,14 @@ namespace Sift.Server
             try
             {
                 foreach (string cid in bridge.Channels)
-                    asterisk.Client.Bridges.RemoveChannel(bridge.Id, cid);
-                asterisk.Client.Bridges.Destroy(bridge.Id);
-                program.LinkedCallers.Remove(Caller);
+                    Provider.Client.Bridges.RemoveChannel(bridge.Id, cid);
+                try
+                {
+                    Provider.Hangup(Destination.Id);
+                }
+                catch (Exception) { }
+                Provider.Client.Bridges.Destroy(bridge.Id);
+                program.LinkedCallers.Remove(Originator);
                 Console.WriteLine("bridge: " + Id + " destroyed");
                 if (!ended)
                     End?.Invoke(this, null);
