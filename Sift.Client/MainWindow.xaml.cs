@@ -126,7 +126,6 @@ namespace Sift.Client
                     elements[line] = el;
                 }
             }
-            g.RowDefinitions.Add(new RowDefinition());
         }
     }
 }

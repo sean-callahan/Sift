@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sift.Client"
         mc:Ignorable="d"
-        Title="Sift" Width="1280" Height="720" MinWidth="800" MinHeight="600" Background="#FF252525" >
+        Title="Sift" Width="1280" Height="720" MinWidth="800" MinHeight="600" Background="#FF252525" WindowStartupLocation="CenterScreen" >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*" />
@@ -18,7 +18,7 @@
         <Grid Grid.Row="0" Grid.ColumnSpan="2" Background="#FF1F1F1F">
             <Image Source="Images/logo_darkgray-40x.png" HorizontalAlignment="Left" Margin="10" RenderOptions.BitmapScalingMode="HighQuality" />
         </Grid>
-        <Grid Name="LineGrid" Grid.Row="1">
+        <Grid Name="LineGrid" Grid.Row="1" Margin="5">
             
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1" Margin="10">

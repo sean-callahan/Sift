@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sift.Client"
         mc:Ignorable="d"
-        Title="Sift - Login" Height="275" Width="400" MaxHeight="275" MaxWidth="400" Background="#FF252525">
+        Title="Sift - Login" Height="275" Width="400" MaxHeight="275" MaxWidth="400" Background="#FF252525" WindowStartupLocation="CenterScreen">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="90" />

@@ -20,7 +20,7 @@ namespace Sift.Server
 
             try
             {
-                Program p = new Program(new Asterisk("10.199.1.172", 8088, "asterisk", "asterisk", "hello-world"), 8);
+                Program p = new Program(new Asterisk("10.199.1.172", 8088, "asterisk", "asterisk", "hello-world"), 12);
                 p.Connect();
                 p.Process();
             }
