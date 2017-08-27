@@ -51,7 +51,11 @@ namespace Sift.Server
 
         public void Remove(Caller c)
         {
-            asterisk.Client.Bridges.RemoveChannel(bridge.Id, c.Id);
+            try
+            {
+                asterisk.Client.Bridges.RemoveChannel(bridge.Id, c.Id);
+            }
+            catch { }
         }
     }
 }

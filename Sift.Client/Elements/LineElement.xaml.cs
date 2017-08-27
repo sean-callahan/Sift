@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -62,6 +64,20 @@ namespace Sift.Client.Elements
                 Duration.Content = (DateTime.Now - created).ToString("c");
         }
 
+        private string formatNumber(string number)
+        {
+            if (!number.StartsWith("+1"))
+                return number;
+            StringBuilder sb = new StringBuilder();
+            sb.Append('(');
+            sb.Append(number.Substring(2, 3));
+            sb.Append(") ");
+            sb.Append(number.Substring(5, 3));
+            sb.Append('-');
+            sb.Append(number.Substring(8, 4));
+            return sb.ToString();
+        }
+
         public void Update()
         {
             ScreenToggle.Content = Line.State == LineState.Screening ? "UNSCREEN" : "SCREEN";
@@ -72,7 +88,7 @@ namespace Sift.Client.Elements
                 return;
             }
             SetColors(Line.State);
-            CallerName.Content = string.IsNullOrWhiteSpace(Line.Caller.Name) ? Line.Caller.Number : Line.Caller.Name;
+            CallerName.Content = string.IsNullOrWhiteSpace(Line.Caller.Name) ? formatNumber(Line.Caller.Number) : Line.Caller.Name;
             CallerLocation.Content = Line.Caller.Location;
             Comment.Text = Line.Caller.Comment;
             created = Line.Caller.Created;

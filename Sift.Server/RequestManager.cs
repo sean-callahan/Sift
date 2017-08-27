@@ -27,6 +27,8 @@ namespace Sift.Server
             if (line == null || line.Caller == null || Program.LinkedCallers.ContainsKey(line.Caller))
                 return;
 
+            Program.HoldGroup.Remove(line.Caller);
+
             AsteriskLink link = new AsteriskLink(Program, (Asterisk)Program.Provider, Program.Lines[e.Index].Caller, "2001");
             link.Start();
 

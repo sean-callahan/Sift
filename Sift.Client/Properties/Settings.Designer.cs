@@ -25,7 +25,7 @@ namespace Sift.Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
         public string Address {
             get {
                 return ((string)(this["Address"]));
@@ -37,6 +37,7 @@ namespace Sift.Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7282")]
         public int Port {
             get {
                 return ((int)(this["Port"]));

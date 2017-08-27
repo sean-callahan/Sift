@@ -1,42 +1,79 @@
 ﻿using System;
-
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Lidgren.Network;
 
 namespace Sift.Common.Network
 {
     public abstract class PacketConsumer
     {
+        public const string App = "sift";
+        public const byte Version = 0;
+
         protected abstract NetPeer Peer { get; }
 
-        public void ReadMessages(object sender, EventArgs e)
+        public void TryReadMessage()
         {
-            while (Network.AppStillIdle)
+            NetIncomingMessage im;
+            while ((im = Peer.ReadMessage()) != null)
             {
-                NetIncomingMessage im;
-                while ((im = Peer.ReadMessage()) != null)
+                switch (im.MessageType)
                 {
-                    switch (im.MessageType)
-                    {
-                        case NetIncomingMessageType.StatusChanged:
-                            break;
-                        case NetIncomingMessageType.Data:
-                            PacketType type = (PacketType)im.ReadByte();
-                            try
-                            {
-                                handlePacket(type, im);
-                            }
-                            catch (Exception ex)
-                            {
-                                Error?.Invoke(this, new ErrorPacket(ex));
-                            }
-                            break;
-                        default:
-
-                            break;
-                    }
-                    Peer.Recycle(im);
+                    case NetIncomingMessageType.WarningMessage:
+                    case NetIncomingMessageType.ErrorMessage:
+                        Error?.Invoke(this, new ErrorPacket(new Exception(im.ReadString())));
+                        break;
+                    case NetIncomingMessageType.Data:
+                        PacketType type = (PacketType)im.ReadByte();
+                        try
+                        {
+                            handlePacket(type, im);
+                        }
+                        catch (Exception ex)
+                        {
+                            Error?.Invoke(this, new ErrorPacket(ex));
+                        }
+                        break;
+                    case NetIncomingMessageType.StatusChanged:
+                        NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
+                        string reason = im.ReadString();
+                        Console.WriteLine($"New status {status} ({reason})");
+                        if (Peer.GetType() == typeof(NetClient))
+                        {
+                            Debug.WriteLine($"New status {status} ({reason})");
+                            if (status == NetConnectionStatus.Connected)
+                                ConnectionSuccess?.Invoke(im.SenderConnection, null);
+                            if (status == NetConnectionStatus.Disconnected)
+                                Disconnected?.Invoke(this, reason);
+                        }
+                        break;
+                    case NetIncomingMessageType.ConnectionApproval:
+                        vetConnection(im.SenderConnection, im);
+                        break;
+                    default:
+                        break;
                 }
+                Peer.Recycle(im);
             }
+        }
+
+        private void vetConnection(NetConnection sender, NetIncomingMessage msg)
+        {
+            string app = msg.ReadString();
+            byte version = msg.ReadByte();
+
+            if (app != App)
+            {
+                sender.Deny("Not a Sift-compatible server.");
+                return;
+            }
+            if (version != Version)
+            {
+                sender.Deny("Unsupported server version.");
+                return;
+            }
+
+            sender.Approve();
         }
 
         private void handlePacket(PacketType type, NetIncomingMessage msg)
@@ -72,6 +109,9 @@ namespace Sift.Common.Network
                     break;
             }
         }
+
+        public event EventHandler<string> Disconnected;
+        public event EventHandler ConnectionSuccess;
 
         public event EventHandler<UpdateAppState> UpdateAppState;
         public event EventHandler<UpdateLineState> UpdateLineState;

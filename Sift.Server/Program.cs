@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Sift.Common;
 using Sift.Common.Network;
@@ -22,7 +23,8 @@ namespace Sift.Server
             {
                 Program p = new Program(new Asterisk("10.199.1.172", 8088, "asterisk", "asterisk", "hello-world"), 12);
                 p.Connect();
-                p.Process();
+                CancellationTokenSource cts = new CancellationTokenSource();
+                p.ProcessLoop(cts.Token);
             }
             catch (Exception e)
             {
@@ -30,6 +32,8 @@ namespace Sift.Server
                 Console.ReadLine();
             }
         }
+
+        public bool Running { get; set; }
 
         public IVoipProvider Provider { get; }
         public IReadOnlyList<Line> Lines { get; }
@@ -54,7 +58,7 @@ namespace Sift.Server
             provider.CallerStart += Provider_CallerStart;
             provider.CallerEnd += Provider_CallerEnd;
             
-            Server = new SdpServer(7282);
+            Server = new SdpServer(7777);
             Server.Start();
 
             new RequestManager(this);
@@ -81,9 +85,13 @@ namespace Sift.Server
             HoldGroup = new AsteriskGroup(Provider, GroupType.Holding);
         }
 
-        public void Process()
+        public void ProcessLoop(CancellationToken cancel)
         {
-            Server?.ReadMessages(this, null);
+            while (!cancel.IsCancellationRequested)
+            {
+                Server.TryReadMessage();
+                Thread.Sleep(1);
+            }
         }
 
         private void Provider_CallerEnd(object sender, Caller c)

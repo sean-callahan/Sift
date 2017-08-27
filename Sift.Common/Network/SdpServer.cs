@@ -1,11 +1,10 @@
-﻿using Lidgren.Network;
+﻿using System.Net;
+using Lidgren.Network;
 
 namespace Sift.Common.Network
 {
     public class SdpServer : PacketConsumer
     {
-        public const string App = "sift";
-
         private NetServer server;
 
         protected override NetPeer Peer => server;
@@ -13,7 +12,10 @@ namespace Sift.Common.Network
         public SdpServer(int port)
         {
             NetPeerConfiguration config = new NetPeerConfiguration(App);
+            config.AutoFlushSendQueue = true;
             config.Port = port;
+            config.BroadcastAddress = IPAddress.Any;
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             server = new NetServer(config);
         }
         
@@ -26,7 +28,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            server.SendToAll(msg, NetDeliveryMethod.ReliableUnordered);
+            server.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
         public void Send(NetConnection conn, IPacket packet)
@@ -36,7 +38,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            server.SendMessage(msg, conn, NetDeliveryMethod.ReliableUnordered);
+            server.SendMessage(msg, conn, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

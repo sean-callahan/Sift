@@ -13,6 +13,9 @@ namespace Sift.Client
         public NetworkSettingsWindow()
         {
             InitializeComponent();
+
+            Address.Text = Properties.Settings.Default.Address;
+            Port.Text = Properties.Settings.Default.Port.ToString();
         }
 
         public async Task Wait()

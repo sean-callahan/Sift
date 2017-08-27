@@ -24,7 +24,8 @@
         <Label Grid.Row="2" Grid.Column="0">Password</Label>
         <PasswordBox Grid.Row="2" Grid.Column="1" Margin="5"></PasswordBox>
         <Label Grid.Row="3" Grid.Column="0">Login as</Label>
-        <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" />
+        <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Name="LoginAs" />
+        <Image Name="SettingsButton" Grid.Row="4" Grid.Column="0" Margin="5" Source="Images/icon_cog-30x.png" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" MouseLeftButtonDown="SettingsButton_MouseLeftButtonDown"/>
         <Button x:Name="LoginButton" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Margin="5" Width="50" Content="Login" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Click="LoginButton_Click" />
     </Grid>
 </Window>

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Media;
 using Sift.Client.Elements;
 using Sift.Common;
 using Sift.Common.Network;
@@ -24,14 +24,26 @@ namespace Sift.Client
 
         public SdpClient Client { get; }
 
+        public bool HasConnection
+        {
+            set
+            {
+                ConnectionStatus.Content = value ? "CONNECTED" : "DISCONNECTED";
+                ConnectionStatus.Foreground = new SolidColorBrush(value ? Colors.DarkGreen : Colors.DarkRed);    
+            }
+        }
+
         public MainWindow(SdpClient client, int lines)
         {
+            InitializeComponent();
+
             Client = client;
             Client.UpdateLineState += Client_UpdateLineState;
+            
 
             Client.Send(new RequestLine(-1)); // request all lines
 
-            InitializeComponent();
+            HasConnection = true;
 
             Screener = new ScreenerElement(Client);
             Grid.SetRow(Screener, 0);
@@ -126,6 +138,12 @@ namespace Sift.Client
                     elements[line] = el;
                 }
             }
+        }
+
+        private void Window_Closed(object sender, System.EventArgs e)
+        {
+            Client.Disconnect();
+            Application.Current.Shutdown();
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Sift.Common.Network
 {
-    internal class Network
+    public class Network
     {
         public static bool AppStillIdle
         {

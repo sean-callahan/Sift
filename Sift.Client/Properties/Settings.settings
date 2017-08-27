@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="Address" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>
     <Setting Name="Port" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">7282</Value>
     </Setting>
   </Settings>
 </SettingsFile>

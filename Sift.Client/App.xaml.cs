@@ -19,24 +19,11 @@ namespace Sift.Client
             Client = new SdpClient();
             
 
-            ComponentDispatcher.ThreadIdle += new EventHandler(Client.ReadMessages);
+            ComponentDispatcher.ThreadIdle += (_, __) => Client.TryReadMessage();
         }
 
-        private async void App_Startup(object sender, StartupEventArgs e)
+        private void App_Startup(object sender, StartupEventArgs e)
         {
-            string address = Settings.Default.Address;
-            if (string.IsNullOrWhiteSpace(address))
-            {
-                NetworkSettingsWindow settings = new NetworkSettingsWindow();
-                settings.Show();
-                await settings.Wait();
-                settings.Hide();
-            }
-            address = Settings.Default.Address;
-            int port = Settings.Default.Port;
-
-            Client.Connect(address, port);
-
             new LoginWindow(Client).Show();
         }
 
