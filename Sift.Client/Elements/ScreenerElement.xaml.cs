@@ -19,9 +19,15 @@ namespace Sift.Client.Elements
                 if (line == value)
                     return;
                 if (value == null || value.Caller == null)
+                {
                     Clear();
+                    SetEnabled(false);
+                }
                 else
+                {
                     Show(value);
+                    SetEnabled(true);
+                }
                 line = value;
             }
         }
@@ -51,6 +57,13 @@ namespace Sift.Client.Elements
             CallerName.Text = string.Empty;
             Location.Text = string.Empty;
             Comment.Text = string.Empty;
+        }
+
+        internal void SetEnabled(bool enabled)
+        {
+            CallerName.IsEnabled = enabled;
+            Location.IsEnabled = enabled;
+            Comment.IsEnabled = enabled;
         }
 
         private void Save_Click(object sender, System.Windows.RoutedEventArgs e)

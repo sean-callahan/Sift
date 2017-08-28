@@ -74,6 +74,7 @@
     <Compile Include="Destination.cs" />
     <Compile Include="IVoipProvider.cs" />
     <Compile Include="Util\DateTimeExtensions.cs" />
+    <Compile Include="VoipProviderConnectionState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

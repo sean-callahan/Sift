@@ -57,6 +57,7 @@ namespace Sift.Server
 
             provider.CallerStart += Provider_CallerStart;
             provider.CallerEnd += Provider_CallerEnd;
+            provider.ConnectionStateChanged += Provider_ConnectionStateChanged;
             
             Server = new SdpServer(7777);
             Server.Start();
@@ -65,10 +66,21 @@ namespace Sift.Server
             new UpdateManager(this);
         }
 
+        private void Provider_ConnectionStateChanged(object sender, VoipProviderConnectionState state)
+        {
+            switch (state)
+            {
+                case VoipProviderConnectionState.Connecting:
+                    Console.WriteLine($"Trying to connect to {Provider.Name}...");
+                    break;
+                case VoipProviderConnectionState.Open:
+                    Console.WriteLine($"Connected to {Provider.Name}");
+                    break;
+            }
+        }
+
         public async void Connect()
         {
-            Console.WriteLine("Trying to connect to Asterisk server...");
-
             Provider.Connect();
 
             int tries = 0;
@@ -76,13 +88,18 @@ namespace Sift.Server
             {
                 tries++;
                 if (tries > 40)
-                    throw new Exception("could not connect to Asterisk");
+                    throw new Exception($"Could not connect to {Provider.Name}");
                 await Task.Delay(250);
             }
 
-            Console.WriteLine("Connected to Asterisk server");
-
-            HoldGroup = new AsteriskGroup(Provider, GroupType.Holding);
+            try
+            {
+                HoldGroup = new AsteriskGroup(Provider, GroupType.Holding);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         public void ProcessLoop(CancellationToken cancel)

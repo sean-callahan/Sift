@@ -4,11 +4,15 @@ namespace Sift.Common
 {
     public interface IVoipProvider
     {
+        event EventHandler<VoipProviderConnectionState> ConnectionStateChanged;
+
         event EventHandler<Caller> CallerStart;
         event EventHandler<Caller> CallerEnd;
 
         event EventHandler<Destination> DestinationStart;
         event EventHandler<Destination> DestinationEnd;
+
+        string Name { get; }
 
         bool Connected { get; }
 

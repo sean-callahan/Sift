@@ -34,8 +34,7 @@ namespace Sift.Server
                     bridgeType = "mixing";
                     break;
                 default:
-                    bridgeType = "";
-                    break;
+                    throw new Exception("Unsupported group type");
             }
             
             bridge = asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), Asterisk.AppName);

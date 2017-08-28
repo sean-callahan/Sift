@@ -16,7 +16,7 @@ namespace Sift.Client
     {
         public List<Line> Lines { get; }
 
-        public LineElement SelectedLine { get; private set; }
+        public Line SelectedLine { get; private set; }
 
         public ScreenerElement Screener { get; }
 
@@ -54,6 +54,8 @@ namespace Sift.Client
             for (int i = 0; i < lines; i++)
                 Lines.Add(new Line(i));
 
+            SelectLine(Lines[0]);
+
             ConstructLineGrid(LineGrid, Lines, out elements);
         }
 
@@ -82,6 +84,9 @@ namespace Sift.Client
             line.Caller.Comment = e.Comment;
 
             elements[line].Update();
+
+            if (line == SelectedLine)
+                SelectLine(line);
         }
 
         private void lineElementClick(object sender, MouseButtonEventArgs e)
@@ -92,12 +97,17 @@ namespace Sift.Client
                 if (el != line)
                     el.ShowBorder = false;
             }
-            SelectedLine = line;
-            if (SelectedLine != null)
+            SelectLine(line.Line);
+            if (line != null)
             {
                 line.ShowBorder = true;
             }
-            Screener.Line = SelectedLine.Line;
+        }
+
+        private void SelectLine(Line line)
+        {
+            SelectedLine = line;
+            Screener.Line = line;
         }
 
         private void ConstructLineGrid(Grid g, IList<Line> lines, out IDictionary<Line, LineElement> elements)

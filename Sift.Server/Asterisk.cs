@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using AsterNET.ARI;
+using AsterNET.ARI.Middleware;
 using AsterNET.ARI.Models;
 using Sift.Common;
 
@@ -16,10 +17,13 @@ namespace Sift.Server
 
         public event EventHandler<Destination> DestinationStart;
         public event EventHandler<Destination> DestinationEnd;
+        public event EventHandler<VoipProviderConnectionState> ConnectionStateChanged;
 
         public bool Connected => Client.Connected;
 
         public AriClient Client { get; }
+
+        public string Name => "Asterisk";
 
         private Dictionary<string, Caller> callerRegistry = new Dictionary<string, Caller>();
         public Dictionary<string, Destination> DestinationRegistry = new Dictionary<string, Destination>();
@@ -29,9 +33,37 @@ namespace Sift.Server
         public Asterisk(string addr, int port, string user, string secret, string app)
         {
             Client = new AriClient(new StasisEndpoint(addr, port, user, secret), app);
+            Client.OnConnectionStateChanged += Client_OnConnectionStateChanged;
 
             Client.OnStasisStartEvent += Client_OnStasisStartEvent;
             Client.OnStasisEndEvent += Client_OnStasisEndEvent;
+        }
+
+        private void Client_OnConnectionStateChanged(object sender)
+        {
+            VoipProviderConnectionState state;
+            switch (Client.ConnectionState)
+            {
+                case ConnectionState.None:
+                    state = VoipProviderConnectionState.None;
+                    break;
+                case ConnectionState.Connecting:
+                    state = VoipProviderConnectionState.Connecting;
+                    break;
+                case ConnectionState.Open:
+                    state = VoipProviderConnectionState.Open;
+                    break;
+                case ConnectionState.Closing:
+                    state = VoipProviderConnectionState.Closing;
+                    break;
+                case ConnectionState.Closed:
+                    state = VoipProviderConnectionState.Closed;
+                    break;
+                default:
+                    Console.WriteLine($"Asterisk: Received unknown connection state {Client.ConnectionState}");
+                    return;
+            }
+            ConnectionStateChanged?.Invoke(this, state);
         }
 
         public void Connect() => Client.Connect();

@@ -36,6 +36,13 @@ namespace Sift.Server
             this.program = program;
 
             bridge = asterisk.Client.Bridges.Create("mixing", Id.ToString(), Asterisk.AppName);
+            Provider.Client.OnBridgeDestroyedEvent += Client_OnBridgeDestroyedEvent;
+        }
+
+        private void Client_OnBridgeDestroyedEvent(AsterNET.ARI.IAriClient sender, BridgeDestroyedEvent e)
+        {
+            if (e.Bridge.Id == bridge.Id)
+                Dispose();
         }
 
         public void Start()
@@ -99,12 +106,7 @@ namespace Sift.Server
             {
                 foreach (string cid in bridge.Channels)
                     Provider.Client.Bridges.RemoveChannel(bridge.Id, cid);
-                try
-                {
-                    Provider.Hangup(Destination.Id);
-                }
-                catch (Exception) { }
-                Provider.Client.Bridges.Destroy(bridge.Id);
+                try { Provider.Hangup(Destination.Id); } catch (Exception) { }
                 program.LinkedCallers.Remove(Originator);
                 Console.WriteLine("bridge: " + Id + " destroyed");
                 if (!ended)
