@@ -2,10 +2,8 @@
 
 namespace Sift.Common.Network
 {
-    public interface IPacket
+    public interface IPacket : ICodec
     {
         PacketType Type { get; } 
-        void Decode(NetIncomingMessage msg);
-        void Encode(NetOutgoingMessage msg);
     }
 }

@@ -73,7 +73,10 @@ namespace Sift.Common.Network
                 return;
             }
 
-            sender.Approve();
+            User user = new User();
+            user.Decode(msg);
+
+            RequestUserLogin?.Invoke(sender, user);
         }
 
         private void handlePacket(PacketType type, NetIncomingMessage msg)
@@ -110,17 +113,21 @@ namespace Sift.Common.Network
             }
         }
 
+
         public event EventHandler<string> Disconnected;
         public event EventHandler ConnectionSuccess;
-
+        
         public event EventHandler<UpdateAppState> UpdateAppState;
         public event EventHandler<UpdateLineState> UpdateLineState;
+
         public event EventHandler<LoginRequest> LoginRequest;
         public event EventHandler<RequestDump> RequestDump;
         public event EventHandler<RequestScreen> RequestScreen;
         public event EventHandler<RequestHold> RequestHold;
         public event EventHandler<RequestLine> RequestLine;
         public event EventHandler<RequestAir> RequestAir;
+        public event EventHandler<User> RequestUserLogin;
+
         public event EventHandler<ErrorPacket> Error;
     }
 }

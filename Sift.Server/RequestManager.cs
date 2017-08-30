@@ -11,13 +11,24 @@ namespace Sift.Server
         public RequestManager(Program program)
         {
             Program = program;
-
+            
             Program.Server.LoginRequest += Server_LoginRequest;
             Program.Server.RequestDump += Server_RequestDump;
             Program.Server.RequestScreen += Server_RequestScreen;
             Program.Server.RequestHold += Server_RequestHold;
             Program.Server.RequestLine += Server_RequestLine;
             Program.Server.RequestAir += Server_RequestAir;
+            Program.Server.RequestUserLogin += Server_RequestUserLogin;
+        }
+
+        private void Server_RequestUserLogin(object sender, User user)
+        {
+            NetConnection conn = (NetConnection)sender;
+
+            if (LoginManager.Login(user))
+                conn.Approve();
+            else
+                conn.Deny("Invalid username or password");
         }
 
         private void Server_RequestAir(object sender, RequestAir e)

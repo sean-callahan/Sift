@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Sift.Client.Properties;
+using Sift.Common;
 using Sift.Common.Network;
 
 namespace Sift.Client
@@ -56,7 +57,10 @@ namespace Sift.Client
         {
             if (connectionSent)
                 return;
-            Client.Connect(Settings.Default.Address, Settings.Default.Port);
+
+            User u = User.Create(UsernameBox.Text, PasswordBox.Password);
+
+            Client.Connect(Settings.Default.Address, Settings.Default.Port, u);
             connectionSent = true;
         }
 

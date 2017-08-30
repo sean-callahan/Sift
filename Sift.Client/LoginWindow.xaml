@@ -20,9 +20,9 @@
         </Grid.ColumnDefinitions>
         <Image Grid.Row="0" Grid.ColumnSpan="2" Source="Images/logo_gray-90x.png" Margin="10" />
         <Label Grid.Row="1" Grid.Column="0">Username</Label>
-        <TextBox Grid.Row="1" Grid.Column="1" Margin="5"></TextBox>
+        <TextBox Name="UsernameBox" Grid.Row="1" Grid.Column="1" Margin="5"></TextBox>
         <Label Grid.Row="2" Grid.Column="0">Password</Label>
-        <PasswordBox Grid.Row="2" Grid.Column="1" Margin="5"></PasswordBox>
+        <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" Margin="5"></PasswordBox>
         <Label Grid.Row="3" Grid.Column="0">Login as</Label>
         <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Name="LoginAs" />
         <Image Name="SettingsButton" Grid.Row="4" Grid.Column="0" Margin="5" Source="Images/icon_cog-30x.png" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" MouseLeftButtonDown="SettingsButton_MouseLeftButtonDown"/>

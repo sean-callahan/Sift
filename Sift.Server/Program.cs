@@ -45,6 +45,11 @@ namespace Sift.Server
 
         public Program(IVoipProvider provider, int numLines)
         {
+            using (LiteDB.LiteDatabase db = new LiteDB.LiteDatabase(@".\Data.db"))
+            {
+                CreateAndVerifyDatabase(db);
+            }
+
             List<Line> lines = new List<Line>(numLines);
 
             for (int i = 0; i < numLines; i++)
@@ -64,6 +69,15 @@ namespace Sift.Server
 
             new RequestManager(this);
             new UpdateManager(this);
+        }
+
+        private void CreateAndVerifyDatabase(LiteDB.LiteDatabase db)
+        {
+            var col = db.GetCollection<User>("users");
+            if (col.Count() < 1)
+            {
+                LoginManager.Create("admin", "changeme");
+            }
         }
 
         private void Provider_ConnectionStateChanged(object sender, VoipProviderConnectionState state)
