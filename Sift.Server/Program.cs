@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SQLite;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Sift.Common;
 using Sift.Common.Network;
+using Sift.Server.Util;
 
 namespace Sift.Server
 {
@@ -43,19 +48,31 @@ namespace Sift.Server
 
         public SdpServer Server { get; }
 
+        public IDbConnection Database => CreateDatabase("sqlite", dbConnectionString);
+
+        private string dbConnectionString;
+
         public Program(IVoipProvider provider, int numLines)
         {
-            using (LiteDB.LiteDatabase db = new LiteDB.LiteDatabase(@".\Data.db"))
+            try
             {
-                CreateAndVerifyDatabase(db);
+                File.Delete("sift.sqlite");
+                SQLiteConnection.CreateFile("sift.sqlite");
             }
+            catch (Exception) {}
+
+            dbConnectionString = "Data Source=sift.sqlite;Version=3;";
+
+            initDB();
+            
+            LoginManager.Create(this, "admin", "changeme");
 
             List<Line> lines = new List<Line>(numLines);
 
             for (int i = 0; i < numLines; i++)
             {
                 lines.Add(new Line(i));
-            }
+            } 
 
             Lines = lines;
             Provider = provider;
@@ -71,12 +88,24 @@ namespace Sift.Server
             new UpdateManager(this);
         }
 
-        private void CreateAndVerifyDatabase(LiteDB.LiteDatabase db)
+        private void initDB()
         {
-            var col = db.GetCollection<User>("users");
-            if (col.Count() < 1)
+            using (IDbConnection db = Database)
             {
-                LoginManager.Create("admin", "changeme");
+                db.Open();
+                IDbCommand cmd = DbUtil.CreateCommand(db, "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(50), passwd VARCHAR(255));");
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private IDbConnection CreateDatabase(string type, string connectionString)
+        {
+            switch (type)
+            {
+                case "sqlite":
+                    return new SQLiteConnection(connectionString);
+                default:
+                    throw new Exception("Unsupported database type.");
             }
         }
 

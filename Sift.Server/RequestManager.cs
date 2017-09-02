@@ -1,4 +1,5 @@
 ﻿using Lidgren.Network;
+
 using Sift.Common;
 using Sift.Common.Network;
 
@@ -24,8 +25,7 @@ namespace Sift.Server
         private void Server_RequestUserLogin(object sender, User user)
         {
             NetConnection conn = (NetConnection)sender;
-
-            if (LoginManager.Login(user))
+            if (LoginManager.Login(Program, user))
                 conn.Approve();
             else
                 conn.Deny("Invalid username or password");
@@ -92,7 +92,7 @@ namespace Sift.Server
 
         private void Server_LoginRequest(object sender, LoginRequest e)
         {
-            Program.Server.Send((NetConnection)sender, new UpdateAppState(Program.Lines.Count));
+            Program.Server.Send((NetConnection)sender, new UpdateAppState(Program.Lines.Count, Program.Provider.Type));
         }
     }
 }

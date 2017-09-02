@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AsterNET.ARI;
 using AsterNET.ARI.Middleware;
 using AsterNET.ARI.Models;
+
 using Sift.Common;
 
 namespace Sift.Server
@@ -24,6 +25,8 @@ namespace Sift.Server
         public AriClient Client { get; }
 
         public string Name => "Asterisk";
+
+        public VoipProviders Type => VoipProviders.Asterisk;
 
         private Dictionary<string, Caller> callerRegistry = new Dictionary<string, Caller>();
         public Dictionary<string, Destination> DestinationRegistry = new Dictionary<string, Destination>();

@@ -9,6 +9,11 @@
             <Setter Property="BorderBrush" Value="#FF424242" />
             <Setter Property="Foreground" Value="LightGray" />
         </Style>
+        <Style TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="#FF515151" />
+            <Setter Property="BorderBrush" Value="#FF424242" />
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
         <Style TargetType="{x:Type PasswordBox}">
             <Setter Property="Background" Value="#FF515151" />
             <Setter Property="BorderBrush" Value="#FF424242" />

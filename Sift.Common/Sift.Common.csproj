@@ -37,9 +37,6 @@
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="LiteDB, Version=3.1.4.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiteDB.3.1.4\lib\net462\LiteDB.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -67,6 +64,7 @@
     <Compile Include="Network\SdpServer.cs" />
     <Compile Include="Network\Types\ErrorPacket.cs" />
     <Compile Include="Network\Types\LoginRequest.cs" />
+    <Compile Include="Network\Types\ProviderSettings.cs" />
     <Compile Include="Network\Types\RequestAir.cs" />
     <Compile Include="Network\Types\RequestDump.cs" />
     <Compile Include="Network\Types\RequestHold.cs" />
@@ -81,6 +79,7 @@
     <Compile Include="Util\DateTimeExtensions.cs" />
     <Compile Include="Util\Encoding.cs" />
     <Compile Include="VoipProviderConnectionState.cs" />
+    <Compile Include="VoipProviders.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

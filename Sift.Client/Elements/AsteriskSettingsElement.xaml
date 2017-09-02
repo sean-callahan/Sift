@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Sift.Client.Elements.AsteriskSettingsElement"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Sift.Client.Elements"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" Grid.Row="0" Content="Screener Extension"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Margin="5"/>
+        </Grid>
+        <Grid Grid.Column="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="150"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" Grid.Row="0" Content="Hybrid Extensions"/>
+            <ListBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" />
+            <TextBox Grid.Column="0" Grid.Row="2" Margin="5"/>
+            <Button Grid.Column="1" Grid.Row="2" Margin="5" Width="75" HorizontalAlignment="Left" Content="Add"/>
+            <Button Grid.Column="1" Grid.Row="2" Margin="85,5,5,5" Width="75" HorizontalAlignment="Left" Content="Remove"/>
+            
+        </Grid>
+    </Grid>
+</UserControl>

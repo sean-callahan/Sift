@@ -1,41 +1,56 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Data;
 using System.Text;
-using LiteDB;
+
 using Sift.Common;
+using Sift.Server.Util;
 
 namespace Sift.Server
 {
-    public class LoginManager
+    internal class LoginManager
     {
-        public static User Create(string username, string password)
+        public static User Create(Program program, string username, string password)
         {
             User u = User.Create(username, password);
             u.Hash = BCrypt.Net.BCrypt.HashPassword(password);
-            using (LiteDatabase db = new LiteDatabase(@".\Data.db"))
+            using (IDbConnection db = program.Database)
             {
-                var col = db.GetCollection<User>("users");
-                var result = col.Find(x => x.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
-                if (result.Count() > 0)
+                db.Open();
+                IDbCommand cmd = DbUtil.CreateCommand(db,
+                    "INSERT INTO users (name, passwd) VALUES (@user, @pass)",
+                    new Dictionary<string, object>
+                    {
+                        { "@user", u.Username },
+                        { "@pass", u.Hash },
+                    }
+                );
+                int affected = cmd.ExecuteNonQuery();
+                if (affected < 1)
                     return null;
-                col.Insert(u);
+                return u;
             }
-            return u;
         }
 
-        public static bool Login(User u)
+        public static bool Login(Program program, User u)
         {
             if (u == null)
                 return false;
-            using (LiteDatabase db = new LiteDatabase(@".\Data.db"))
+            using (IDbConnection db = program.Database)
             {
-                var col = db.GetCollection<User>("users");
-
-                var result = col.Find(x => x.Username.Equals(u.Username)).FirstOrDefault();
-                if (result == null)
+                db.Open();
+                IDbCommand cmd = DbUtil.CreateCommand(db,
+                "SELECT passwd FROM users WHERE name=@user LIMIT 1;",
+                new Dictionary<string, object> { { "@user", u.Username } });
+                using (IDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string hash = (string)reader["passwd"];
+                        return BCrypt.Net.BCrypt.Verify(u.Password, hash);
+                    }
                     return false;
-
-                return BCrypt.Net.BCrypt.Verify(u.Password, result.Hash);
+                }
             }
         }
 

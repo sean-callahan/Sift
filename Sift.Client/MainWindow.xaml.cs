@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+
 using Sift.Client.Elements;
 using Sift.Common;
 using Sift.Common.Network;
@@ -33,8 +34,12 @@ namespace Sift.Client
             }
         }
 
-        public MainWindow(SdpClient client, int lines)
+        private VoipProviders provider;
+
+        public MainWindow(SdpClient client, VoipProviders provider, int lines)
         {
+            this.provider = provider;
+
             InitializeComponent();
 
             Client = client;
@@ -154,6 +159,11 @@ namespace Sift.Client
         {
             Client.Disconnect();
             Application.Current.Shutdown();
+        }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            new VoipProviderSettingsWindow(provider).Show();
         }
     }
 }

@@ -49,7 +49,7 @@ namespace Sift.Client
                 return;
             if (e.LineCount < 1 || e.LineCount > 20)
                 throw new Exception("Received an invalid line count");
-            new MainWindow(Client, e.LineCount).Show();
+            new MainWindow(Client, e.ProviderType, e.LineCount).Show();
             Close();
         }
 

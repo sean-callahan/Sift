@@ -17,6 +17,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2" Background="#FF1F1F1F">
             <Image Source="Images/logo_darkgray-40x.png" HorizontalAlignment="Left" Margin="10" RenderOptions.BitmapScalingMode="HighQuality" />
+            <Button x:Name="Settings" Height="20" Width="75" Margin="5" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Settings" Click="Settings_Click"/>
         </Grid>
         <Grid Name="LineGrid" Grid.Row="1" Margin="5">
             

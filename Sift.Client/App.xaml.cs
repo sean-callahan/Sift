@@ -1,8 +1,6 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Interop;
 
-using Sift.Client.Properties;
 using Sift.Common.Network;
 
 namespace Sift.Client

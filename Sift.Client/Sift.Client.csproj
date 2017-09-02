@@ -59,6 +59,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Elements\AsteriskSettingsElement.xaml.cs">
+      <DependentUpon>AsteriskSettingsElement.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VoipProviderSettingsWindow.xaml.cs">
+      <DependentUpon>VoipProviderSettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Elements\AsteriskSettingsElement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Elements\LineElement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -100,6 +110,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NetworkSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VoipProviderSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,6 +1,5 @@
-﻿using System;
-using Lidgren.Network;
-using LiteDB;
+﻿using Lidgren.Network;
+
 using Sift.Common.Network;
 using Sift.Common.Util;
 
@@ -12,7 +11,6 @@ namespace Sift.Common
         public string Hash { get; set; }
 
         private string base64Password;
-        [BsonIgnore]
         public string Password
         {
             get { return Encoding.Base64Decode(base64Password); }

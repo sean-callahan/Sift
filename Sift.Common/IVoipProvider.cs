@@ -4,6 +4,8 @@ namespace Sift.Common
 {
     public interface IVoipProvider
     {
+        VoipProviders Type { get; }
+
         event EventHandler<VoipProviderConnectionState> ConnectionStateChanged;
 
         event EventHandler<Caller> CallerStart;
