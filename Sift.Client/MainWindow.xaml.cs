@@ -163,7 +163,7 @@ namespace Sift.Client
 
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
-            new VoipProviderSettingsWindow(provider).Show();
+            new VoipProviderSettingsWindow(Client, provider).Show();
         }
     }
 }

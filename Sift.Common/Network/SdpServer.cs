@@ -28,7 +28,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            server.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
+            server.SendToAll(msg, NetDeliveryMethod.Unreliable);
         }
 
         public void Send(NetConnection conn, IPacket packet)
@@ -38,7 +38,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            server.SendMessage(msg, conn, NetDeliveryMethod.ReliableOrdered);
+            server.SendMessage(msg, conn, NetDeliveryMethod.Unreliable);
         }
     }
 }

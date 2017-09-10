@@ -1,7 +1,11 @@
-﻿using Lidgren.Network;
+﻿using System.Collections.Generic;
+using System.Data;
+
+using Lidgren.Network;
 
 using Sift.Common;
 using Sift.Common.Network;
+using Sift.Server.Util;
 
 namespace Sift.Server
 {
@@ -20,12 +24,36 @@ namespace Sift.Server
             Program.Server.RequestLine += Server_RequestLine;
             Program.Server.RequestAir += Server_RequestAir;
             Program.Server.RequestUserLogin += Server_RequestUserLogin;
+            Program.Server.SettingsChanged += Server_SettingsChanged;
+        }
+
+        private void Server_SettingsChanged(object sender, SettingsChanged e)
+        {
+            if (string.IsNullOrWhiteSpace(e.Category))
+                return;
+            using (IDbConnection db = Program.Database.NewConnection())
+            {
+                db.Open();
+                IDbCommand cmd = DbUtil.CreateCommand(db,
+                    "SELECT key, value FROM settings WHERE category=@category;",
+                    new Dictionary<string, object> { { "@category", e.Category } });
+                using (IDataReader reader = cmd.ExecuteReader())
+                {
+                    Dictionary<string, object> items = new Dictionary<string, object>();
+                    while (reader.Read())
+                    {
+                        IDataRecord rec = reader;
+                        items.Add((string)rec["key"], rec["value"]);
+                    }
+                    Program.Server.Send((NetConnection)sender, new SettingsChanged(e.Category, new SettingsCollection(items)));
+                }
+            }
         }
 
         private void Server_RequestUserLogin(object sender, User user)
         {
             NetConnection conn = (NetConnection)sender;
-            if (LoginManager.Login(Program, user))
+            if (LoginManager.Login(Program.Database, user))
                 conn.Approve();
             else
                 conn.Deny("Invalid username or password");

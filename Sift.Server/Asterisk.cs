@@ -4,38 +4,43 @@ using System.Collections.Generic;
 using AsterNET.ARI;
 using AsterNET.ARI.Middleware;
 using AsterNET.ARI.Models;
+using IniParser.Model;
 
 using Sift.Common;
 
 namespace Sift.Server
 {
-    internal class Asterisk : IVoipProvider
+    internal class Asterisk : VoipProviderBase
     {
         public const string AppName = "Sift";
 
-        public event EventHandler<Caller> CallerStart;
-        public event EventHandler<Caller> CallerEnd;
+        public override VoipProviders Type => VoipProviders.Asterisk;
+        public override string Name => VoipProviderFactory.PrettyNames[Type];
 
-        public event EventHandler<Destination> DestinationStart;
-        public event EventHandler<Destination> DestinationEnd;
-        public event EventHandler<VoipProviderConnectionState> ConnectionStateChanged;
+        public override event EventHandler<Caller> CallerStart;
+        public override event EventHandler<Caller> CallerEnd;
 
-        public bool Connected => Client.Connected;
+        public override event EventHandler<Destination> DestinationStart;
+        public override event EventHandler<Destination> DestinationEnd;
+        public override event EventHandler<VoipProviderConnectionState> ConnectionStateChanged;
+
+        public override bool Connected => Client.Connected;
 
         public AriClient Client { get; }
 
-        public string Name => "Asterisk";
+        private readonly Dictionary<string, Caller> callerRegistry = new Dictionary<string, Caller>();
 
-        public VoipProviders Type => VoipProviders.Asterisk;
+        public readonly Dictionary<string, Destination> DestinationRegistry = new Dictionary<string, Destination>();
 
-        private Dictionary<string, Caller> callerRegistry = new Dictionary<string, Caller>();
-        public Dictionary<string, Destination> DestinationRegistry = new Dictionary<string, Destination>();
-
-        private Dictionary<Guid, IGroup> groupRegistry = new Dictionary<Guid, IGroup>();
-
-        public Asterisk(string addr, int port, string user, string secret, string app)
+        public Asterisk(KeyDataCollection data) : base(data)
         {
-            Client = new AriClient(new StasisEndpoint(addr, port, user, secret), app);
+            string host = data["host"];
+            int port = int.Parse(data["port"]);
+            string user = data["username"];
+            string secret = data["secret"];
+            string app = data["app"];
+
+            Client = new AriClient(new StasisEndpoint(host, port, user, secret), app);
             Client.OnConnectionStateChanged += Client_OnConnectionStateChanged;
 
             Client.OnStasisStartEvent += Client_OnStasisStartEvent;
@@ -69,7 +74,7 @@ namespace Sift.Server
             ConnectionStateChanged?.Invoke(this, state);
         }
 
-        public void Connect() => Client.Connect();
+        public override void Connect() => Client.Connect();
 
         private void Client_OnStasisStartEvent(IAriClient sender, StasisStartEvent e)
         {
@@ -81,16 +86,20 @@ namespace Sift.Server
             switch (arg)
             {
                 case StasisArgs.Caller:
-                    Caller c = new Caller(e.Channel.Id);
-                    c.Number = e.Channel.Caller.Number;
-                    c.Created = e.Channel.Creationtime;
+                    Caller c = new Caller(e.Channel.Id)
+                    {
+                        Number = e.Channel.Caller.Number,
+                        Created = e.Channel.Creationtime
+                    };
                     CallerStart?.Invoke(this, c);
                     callerRegistry[e.Channel.Id] = c;
                     break;
                 case StasisArgs.Screener:
                     string name = e.Channel.Name;
-                    Destination s = new Destination(name.Substring(0, name.IndexOf('-')));
-                    s.Id = e.Channel.Id;
+                    Destination s = new Destination(name.Substring(0, name.IndexOf('-')))
+                    {
+                        Id = e.Channel.Id
+                    };
                     DestinationStart?.Invoke(this, s);
                     DestinationRegistry[e.Channel.Id] = s;
                     break;
@@ -115,23 +124,23 @@ namespace Sift.Server
             }
         }
 
-        public void Ring(string channelId)
+        public override void Ring(string channelId)
         {
             Client.Channels.Ring(channelId);
         }
 
-        public void Hangup(string channelId)
+        public override void Hangup(string channelId)
         {
             Client.Channels.Hangup(channelId);
         }
 
-        public void Call(Caller from, string number)
+        public override void Call(Caller from, string number)
         {
             number = "SIP/" + number;
             Client.Channels.Originate(number, app: "hello-world", appArgs: ((int)StasisArgs.Screener).ToString(), callerId: from.Number);
         }
 
-        public void Busy(string channelId)
+        public override void Busy(string channelId)
         {
         }
 

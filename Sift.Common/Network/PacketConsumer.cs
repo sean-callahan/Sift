@@ -110,6 +110,9 @@ namespace Sift.Common.Network
                 case PacketType.ErrorPacket:
                     Error?.Invoke(msg.SenderConnection, new ErrorPacket(msg));
                     break;
+                case PacketType.SettingsChanged:
+                    SettingsChanged?.Invoke(msg.SenderConnection, new SettingsChanged(msg));
+                    break;
             }
         }
 
@@ -129,5 +132,6 @@ namespace Sift.Common.Network
         public event EventHandler<User> RequestUserLogin;
 
         public event EventHandler<ErrorPacket> Error;
+        public event EventHandler<SettingsChanged> SettingsChanged;
     }
 }

@@ -44,7 +44,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = Client.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            Client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(msg, NetDeliveryMethod.Unreliable);
             Client.FlushSendQueue();
         }
     }

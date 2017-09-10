@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sift.Server", "Sift.Server\Sift.Server.csproj", "{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sift.Client", "Sift.Client\Sift.Client.csproj", "{758E43AD-B131-4E92-A266-7335ABD366A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sift.Common", "Sift.Common\Sift.Common.csproj", "{C437BB61-0AB4-48A5-A124-D859B078521C}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Sift.Client.Installer", "Sift.Client.Installer\Sift.Client.Installer.vdproj", "{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,8 +29,14 @@ Global
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Debug|x64.Build.0 = Debug|x64
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Release|x64.ActiveCfg = Release|x64
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Release|x64.Build.0 = Release|x64
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Debug|x64.ActiveCfg = Debug
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Release|x64.ActiveCfg = Release
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A2C76275-30A7-411B-9399-F804E959E8F6}
 	EndGlobalSection
 EndGlobal

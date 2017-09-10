@@ -10,21 +10,40 @@ namespace Sift.Server
 {
     internal class LoginManager
     {
-        public static User Create(Program program, string username, string password)
+        public static bool HasUsername(DatabaseEngine engine, string username)
         {
-            User u = User.Create(username, password);
-            u.Hash = BCrypt.Net.BCrypt.HashPassword(password);
-            using (IDbConnection db = program.Database)
+            using (IDbConnection db = engine.NewConnection())
             {
                 db.Open();
                 IDbCommand cmd = DbUtil.CreateCommand(db,
-                    "INSERT INTO users (name, passwd) VALUES (@user, @pass)",
-                    new Dictionary<string, object>
-                    {
+                    "SELECT 1 FROM users WHERE username=@user",
+                    new Dictionary<string, object> { { "@user", username } });
+                using (IDataReader reader = cmd.ExecuteReader())
+                {
+                    return reader.Read();
+                }
+            }
+        }
+
+        public static User Create(DatabaseEngine engine, string username, string password, int? id = null)
+        {
+            User u = User.Create(username, password);
+            u.Hash = BCrypt.Net.BCrypt.HashPassword(password);
+            using (IDbConnection db = engine.NewConnection())
+            {
+                db.Open();
+                string query = "INSERT INTO users (username, password) VALUES (@user, @pass)";
+                var cmdParams = new Dictionary<string, object>
+                {
                         { "@user", u.Username },
                         { "@pass", u.Hash },
-                    }
-                );
+                };
+                if (id.HasValue)
+                {
+                    query = "INSERT INTO users (id, username, password) VALUES (@id, @user, @pass)";
+                    cmdParams.Add("@id", id);
+                }
+                IDbCommand cmd = DbUtil.CreateCommand(db, query, cmdParams);
                 int affected = cmd.ExecuteNonQuery();
                 if (affected < 1)
                     return null;
@@ -32,21 +51,21 @@ namespace Sift.Server
             }
         }
 
-        public static bool Login(Program program, User u)
+        public static bool Login(DatabaseEngine engine, User u)
         {
             if (u == null)
                 return false;
-            using (IDbConnection db = program.Database)
+            using (IDbConnection db = engine.NewConnection())
             {
                 db.Open();
                 IDbCommand cmd = DbUtil.CreateCommand(db,
-                "SELECT passwd FROM users WHERE name=@user LIMIT 1;",
+                "SELECT password FROM users WHERE username=@user LIMIT 1;",
                 new Dictionary<string, object> { { "@user", u.Username } });
                 using (IDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        string hash = (string)reader["passwd"];
+                        string hash = (string)reader["password"];
                         return BCrypt.Net.BCrypt.Verify(u.Password, hash);
                     }
                     return false;

@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows.Controls;
+
+using Sift.Common;
 
 namespace Sift.Client.Elements
 {
@@ -7,8 +10,12 @@ namespace Sift.Client.Elements
     /// </summary>
     public partial class AsteriskSettingsElement : UserControl
     {
-        public AsteriskSettingsElement()
+        private SettingsCollection settings;
+
+        public AsteriskSettingsElement(SettingsCollection settings)
         {
+            this.settings = settings;
+
             InitializeComponent();
         }
     }

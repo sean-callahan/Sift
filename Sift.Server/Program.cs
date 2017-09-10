@@ -5,7 +5,9 @@ using System.Data.SQLite;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
+using IniParser;
+using IniParser.Model;
+using MySql.Data.MySqlClient;
 using Sift.Common;
 using Sift.Common.Network;
 using Sift.Server.Util;
@@ -26,7 +28,7 @@ namespace Sift.Server
 
             try
             {
-                Program p = new Program(new Asterisk("10.199.1.172", 8088, "asterisk", "asterisk", "hello-world"), 12);
+                Program p = new Program();
                 p.Connect();
                 CancellationTokenSource cts = new CancellationTokenSource();
                 p.ProcessLoop(cts.Token);
@@ -48,24 +50,21 @@ namespace Sift.Server
 
         public SdpServer Server { get; }
 
-        public IDbConnection Database => CreateDatabase("sqlite", dbConnectionString);
+        public DatabaseEngine Database { get; }
 
-        private string dbConnectionString;
-
-        public Program(IVoipProvider provider, int numLines)
+        public Program()
         {
-            try
-            {
-                File.Delete("sift.sqlite");
-                SQLiteConnection.CreateFile("sift.sqlite");
-            }
-            catch (Exception) {}
+            IniData data = ReadConfigFile("sift.ini");
 
-            dbConnectionString = "Data Source=sift.sqlite;Version=3;";
+            int numLines = int.Parse(data["General"]["lines"]);
 
-            initDB();
-            
-            LoginManager.Create(this, "admin", "changeme");
+            Provider = VoipProviderFactory.Create(data["Provider"]);
+
+            Database = new DatabaseEngine(data["Database"]);
+            Database.Initialize();
+
+            if (!LoginManager.HasUsername(Database, "admin"))
+                LoginManager.Create(Database, "admin", "changeme", 0);
 
             List<Line> lines = new List<Line>(numLines);
 
@@ -75,38 +74,16 @@ namespace Sift.Server
             } 
 
             Lines = lines;
-            Provider = provider;
 
-            provider.CallerStart += Provider_CallerStart;
-            provider.CallerEnd += Provider_CallerEnd;
-            provider.ConnectionStateChanged += Provider_ConnectionStateChanged;
+            Provider.CallerStart += Provider_CallerStart;
+            Provider.CallerEnd += Provider_CallerEnd;
+            Provider.ConnectionStateChanged += Provider_ConnectionStateChanged;
             
             Server = new SdpServer(7777);
             Server.Start();
 
             new RequestManager(this);
             new UpdateManager(this);
-        }
-
-        private void initDB()
-        {
-            using (IDbConnection db = Database)
-            {
-                db.Open();
-                IDbCommand cmd = DbUtil.CreateCommand(db, "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(50), passwd VARCHAR(255));");
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        private IDbConnection CreateDatabase(string type, string connectionString)
-        {
-            switch (type)
-            {
-                case "sqlite":
-                    return new SQLiteConnection(connectionString);
-                default:
-                    throw new Exception("Unsupported database type.");
-            }
         }
 
         private void Provider_ConnectionStateChanged(object sender, VoipProviderConnectionState state)
@@ -201,6 +178,13 @@ namespace Sift.Server
             Provider.Ring(c.Id);
 
             Server.Broadcast(new UpdateLineState(line));
+        }
+
+        private static FileIniDataParser parser = new FileIniDataParser();
+
+        private static IniData ReadConfigFile(string name)
+        { 
+            return parser.ReadFile(name);
         }
     }
 }
