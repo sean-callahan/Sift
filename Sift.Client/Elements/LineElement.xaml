@@ -5,14 +5,39 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Sift.Client.Elements"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="500" >
+             d:DesignHeight="100" d:DesignWidth="500" FontFamily="Verdana" >
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#424242">
+                            <ContentPresenter x:Name="MyContentPresenter" 
+                                          Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="#2574A9" />
+            <Setter Property="Foreground" Value="LightGray" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#0C5B90"/>
+                    <Setter Property="Foreground" Value="#888"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Border x:Name="Border" BorderBrush="Transparent" BorderThickness="1">
         <Grid x:Name="MainGrid" Background="#FF515151">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="75" />
                 <ColumnDefinition Width="75" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -21,24 +46,17 @@
             </Grid.RowDefinitions>
             <Label Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" x:Name="Index" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Segoe UI Semibold" Background="#FF424242" Foreground="#FF7A7A7A" />
             <Viewbox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" >
-                <Label x:Name="CallerName" FontWeight="Bold" Foreground="#FF111111" FontSize="18"/>
+                <Label x:Name="CallerName" FontWeight="Bold" Foreground="#FF111111" FontSize="18" Content="First Last"/>
             </Viewbox>
-            <Viewbox Grid.Column="2" Grid.Row="0" HorizontalAlignment="Right">
-                <Label x:Name="CallerLocation" Grid.Column="1" Grid.Row="0" Foreground="#FF111111" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+            <Viewbox Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left">
+                <Label x:Name="CallerLocation" Grid.Column="1" Grid.Row="0" Foreground="#FF111111" FontSize="14" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Content="Location"/>
             </Viewbox>
-            <Viewbox Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2"  HorizontalAlignment="Left"  >
-                <TextBlock TextWrapping="Wrap" x:Name="Comment"  Margin="5" Foreground="#FF111111" HorizontalAlignment="Left" />
+            <Viewbox Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2"  HorizontalAlignment="Left"  >
+                <TextBlock TextWrapping="Wrap" x:Name="Comment"  Margin="5" Foreground="#FF111111" HorizontalAlignment="Left" Text="This is some example text to put here."/>
             </Viewbox>
             <Label Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" x:Name="Duration" HorizontalContentAlignment="Center" FontSize="16" Foreground="#FF959595" />
-            <Grid Grid.Column="4" Grid.RowSpan="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button Name="Air" Grid.Row="0" Grid.Column="0" Content="AIR" Background="#2574A9" Click="Air_Click" />
-                <Button x:Name="ScreenToggle" Grid.Row="1" Grid.Column="0" Content="SCREEN" Background="#2574A9" Click="ScreenToggle_Click" />
-                <Button Name="Dump" Grid.Row="2" Grid.Column="0" Content="HANGUP" Background="#2574A9" Click="Dump_Click" />
+            <Grid Grid.Column="4" Grid.RowSpan="2" Name="ButtonBar">
+
             </Grid>
         </Grid>
     </Border>

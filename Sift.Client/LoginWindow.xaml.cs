@@ -15,7 +15,13 @@ namespace Sift.Client
 
         private bool connectionSent;
 
-        public LoginWindow(SdpClient client)
+        private readonly Role[] possibleRoles = new Role[]
+        {
+            Role.Host,
+            Role.Screener
+        };
+
+    public LoginWindow(SdpClient client)
         {
             Client = client;
             Client.Disconnected += Client_Disconnected;
@@ -25,7 +31,7 @@ namespace Sift.Client
 
             InitializeComponent();
 
-            LoginAs.ItemsSource = new string[] { "Host", "Screener" };
+            LoginAs.ItemsSource = possibleRoles;
             LoginAs.SelectedIndex = 0;
         }
 
@@ -49,7 +55,7 @@ namespace Sift.Client
                 return;
             if (e.LineCount < 1 || e.LineCount > 20)
                 throw new Exception("Received an invalid line count");
-            new MainWindow(Client, e.ProviderType, e.LineCount).Show();
+            new MainWindow(Client, e.ProviderType, e.LineCount, (Role)LoginAs.SelectedItem).Show();
             Close();
         }
 

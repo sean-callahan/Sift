@@ -4,7 +4,7 @@ using AsterNET.ARI.Models;
 
 using Sift.Common;
 
-namespace Sift.Server
+namespace Sift.Server.Asterisk
 {
     public class AsteriskGroup : IGroup
     {
@@ -14,7 +14,7 @@ namespace Sift.Server
 
         public GroupType Type { get; }
 
-        private Asterisk asterisk;
+        private AsteriskProvider asterisk;
         private Bridge bridge;
 
         public AsteriskGroup(IVoipProvider provider, GroupType type)
@@ -23,7 +23,7 @@ namespace Sift.Server
             Provider = provider;
             Type = type;
 
-            asterisk = ((Asterisk)provider);
+            asterisk = ((AsteriskProvider)provider);
 
             string bridgeType;
             switch (type)
@@ -38,7 +38,7 @@ namespace Sift.Server
                     throw new Exception("Unsupported group type");
             }
             
-            bridge = asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), Asterisk.AppName);
+            bridge = asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), AsteriskProvider.AppName);
 
             if (type == GroupType.Holding)
                 asterisk.Client.Bridges.StartMoh(bridge.Id, "default");

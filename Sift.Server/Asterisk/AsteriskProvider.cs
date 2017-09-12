@@ -8,9 +8,9 @@ using IniParser.Model;
 
 using Sift.Common;
 
-namespace Sift.Server
+namespace Sift.Server.Asterisk
 {
-    internal class Asterisk : VoipProviderBase
+    internal class AsteriskProvider : VoipProviderBase
     {
         public const string AppName = "Sift";
 
@@ -32,7 +32,7 @@ namespace Sift.Server
 
         public readonly Dictionary<string, Destination> DestinationRegistry = new Dictionary<string, Destination>();
 
-        public Asterisk(KeyDataCollection data) : base(data)
+        public AsteriskProvider(KeyDataCollection data) : base(data)
         {
             string host = data["host"];
             int port = int.Parse(data["port"]);
@@ -110,6 +110,7 @@ namespace Sift.Server
 
         private void Client_OnStasisEndEvent(IAriClient sender, StasisEndEvent e)
         {
+            Console.WriteLine("StasisEndEvent for " + e.Channel.Id);
             if (callerRegistry.ContainsKey(e.Channel.Id))
             {
                 CallerEnd?.Invoke(this, callerRegistry[e.Channel.Id]);

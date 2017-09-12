@@ -13,23 +13,35 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Sift.Client.Installer", "Si
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}.Debug|x64.ActiveCfg = Debug|x64
 		{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}.Debug|x64.Build.0 = Debug|x64
+		{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}.Release|Any CPU.ActiveCfg = Release|x64
 		{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}.Release|x64.ActiveCfg = Release|x64
 		{DBC0C5CD-6BA3-4631-8591-1CDE79B4E50E}.Release|x64.Build.0 = Release|x64
+		{758E43AD-B131-4E92-A266-7335ABD366A4}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{758E43AD-B131-4E92-A266-7335ABD366A4}.Debug|x64.ActiveCfg = Debug|x64
 		{758E43AD-B131-4E92-A266-7335ABD366A4}.Debug|x64.Build.0 = Debug|x64
+		{758E43AD-B131-4E92-A266-7335ABD366A4}.Release|Any CPU.ActiveCfg = Release|x64
 		{758E43AD-B131-4E92-A266-7335ABD366A4}.Release|x64.ActiveCfg = Release|x64
 		{758E43AD-B131-4E92-A266-7335ABD366A4}.Release|x64.Build.0 = Release|x64
+		{C437BB61-0AB4-48A5-A124-D859B078521C}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Debug|x64.ActiveCfg = Debug|x64
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Debug|x64.Build.0 = Debug|x64
+		{C437BB61-0AB4-48A5-A124-D859B078521C}.Release|Any CPU.ActiveCfg = Release|x64
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Release|x64.ActiveCfg = Release|x64
 		{C437BB61-0AB4-48A5-A124-D859B078521C}.Release|x64.Build.0 = Release|x64
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Debug|Any CPU.ActiveCfg = Debug
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Debug|Any CPU.Build.0 = Debug
 		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Debug|x64.ActiveCfg = Debug
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Release|Any CPU.ActiveCfg = Release
+		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Release|Any CPU.Build.0 = Release
 		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Release|x64.ActiveCfg = Release
 		{4B978C5F-AEF5-423A-9B09-64D77FBC42BF}.Release|x64.Build.0 = Release
 	EndGlobalSection

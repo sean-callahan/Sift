@@ -21,8 +21,6 @@ namespace Sift.Client
 
         public ScreenerElement Screener { get; }
 
-        private IDictionary<Line, LineElement> elements;
-
         public SdpClient Client { get; }
 
         public bool HasConnection
@@ -30,38 +28,45 @@ namespace Sift.Client
             set
             {
                 ConnectionStatus.Content = value ? "CONNECTED" : "DISCONNECTED";
-                ConnectionStatus.Foreground = new SolidColorBrush(value ? Colors.DarkGreen : Colors.DarkRed);    
+                ConnectionStatus.Foreground = new SolidColorBrush(value ? Colors.DarkGreen : Colors.DarkRed);
             }
         }
 
-        private VoipProviders provider;
+        public Role Role { get; } 
 
-        public MainWindow(SdpClient client, VoipProviders provider, int lines)
+        private VoipProviders provider;
+        private IDictionary<Line, LineElement> elements;
+
+        public MainWindow(SdpClient client, VoipProviders provider, int lines, Role role)
         {
             this.provider = provider;
+            Role = role;
+            Client = client;
 
             InitializeComponent();
-
-            Client = client;
-            Client.UpdateLineState += Client_UpdateLineState;
-            
-
-            Client.Send(new RequestLine(-1)); // request all lines
-
-            HasConnection = true;
-
-            Screener = new ScreenerElement(Client);
-            Grid.SetRow(Screener, 0);
-            Grid.SetColumn(Screener, 0);
-            ScreenerFrame.Content = Screener;
 
             Lines = new List<Line>();
             for (int i = 0; i < lines; i++)
                 Lines.Add(new Line(i));
 
-            SelectLine(Lines[0]);
-
             ConstructLineGrid(LineGrid, Lines, out elements);
+
+            
+
+            Client.UpdateLineState += Client_UpdateLineState;
+            Client.Send(new RequestLine(-1)); // request all lines
+
+            HasConnection = true;
+
+            if (Role == Role.Screener)
+            {
+                Screener = new ScreenerElement(Client);
+                Grid.SetRow(Screener, 0);
+                Grid.SetColumn(Screener, 0);
+                ScreenerFrame.Content = Screener;
+            }
+            
+            SelectLine(Lines[0]);
         }
 
         private void Client_UpdateLineState(object sender, UpdateLineState e)
@@ -76,7 +81,8 @@ namespace Sift.Client
             {
                 line.Caller = null;
                 elements[line].Update();
-                Screener.Line = null;
+                if (Role == Role.Screener)
+                    Screener.Line = null;
                 return;
             }
 
@@ -112,7 +118,8 @@ namespace Sift.Client
         private void SelectLine(Line line)
         {
             SelectedLine = line;
-            Screener.Line = line;
+            if (Role == Role.Screener)
+                Screener.Line = line;
         }
 
         private void ConstructLineGrid(Grid g, IList<Line> lines, out IDictionary<Line, LineElement> elements)

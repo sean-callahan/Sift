@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using IniParser.Model;
 
 using Sift.Common;
+using Sift.Server.Asterisk;
 
 namespace Sift.Server
 {
@@ -32,7 +33,7 @@ namespace Sift.Server
             switch (provider)
             {
                 case VoipProviders.Asterisk:
-                    return new Asterisk(data);
+                    return new AsteriskProvider(data);
                 default:
                     throw new NotImplementedException("VoipProviderFactory");
             }

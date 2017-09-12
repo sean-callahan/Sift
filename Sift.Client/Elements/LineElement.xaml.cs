@@ -38,15 +38,20 @@ namespace Sift.Client.Elements
         private DateTime created;
         private DispatcherTimer durationUpdater = new DispatcherTimer();
 
+        private Button Air;
+        private Button Screen;
+        private Button Hangup;
+
         public LineElement(MainWindow parent, Line line)
         {
+            this.parent = parent;
+            Line = line;
+
             InitializeComponent();
+            createButtonBar();
 
             durationUpdater.Tick += DurationUpdater_Tick;
             durationUpdater.Interval = new TimeSpan(0, 0, 1);
-
-            this.parent = parent;
-            Line = line;
 
             if (Line != null)
             {
@@ -56,6 +61,41 @@ namespace Sift.Client.Elements
             Update();
 
             durationUpdater.Start();
+        }
+
+        private void createButtonBar()
+        {
+            for (int i = 0; i < (parent.Role == Role.Screener ? 3 : 2); i++)
+                ButtonBar.RowDefinitions.Add(new RowDefinition());
+
+            Air = new Button
+            {
+                Content = "AIR",
+                IsEnabled = false,
+            };
+            Air.Click += Air_Click;
+            ButtonBar.Children.Add(Air);
+
+            if (parent.Role == Role.Screener)
+            {
+                Screen = new Button
+                {
+                    Content = "SCREEN",
+                    IsEnabled = false,
+                };
+                Screen.Click += Screen_Click;
+                Grid.SetRow(Screen, 1);
+                ButtonBar.Children.Add(Screen);
+            }
+
+            Hangup = new Button()
+            {
+                Content = "HANGUP",
+                IsEnabled = false,
+            };
+            Hangup.Click += Hangup_Click;
+            Grid.SetRow(Hangup, (parent.Role == Role.Screener ? 2 : 1));
+            ButtonBar.Children.Add(Hangup);
         }
 
         private void DurationUpdater_Tick(object sender, EventArgs e)
@@ -80,7 +120,42 @@ namespace Sift.Client.Elements
 
         public void Update()
         {
-            ScreenToggle.Content = Line.State == LineState.Screening ? "UNSCREEN" : "SCREEN";
+            switch (Line.State)
+            {
+                case LineState.Empty:
+                    Air.IsEnabled = false;
+                    if (parent.Role == Role.Screener)
+                        Screen.IsEnabled = false;
+                    Hangup.IsEnabled = false;
+                    break;
+                case LineState.Hold:
+                    Air.IsEnabled = true;
+                    if (parent.Role == Role.Screener)
+                        Screen.IsEnabled = false;
+                    Hangup.IsEnabled = true;
+                    break;
+                case LineState.OnAir:
+                    Air.IsEnabled = false;
+                    if (parent.Role == Role.Screener)
+                        Screen.IsEnabled = false;
+                    Hangup.IsEnabled = true;
+                    break;
+                case LineState.Ringing:
+                    Air.IsEnabled = true;
+                    if (parent.Role == Role.Screener)
+                        Screen.IsEnabled = true;
+                    Hangup.IsEnabled = true;
+                    break;
+                case LineState.Screening:
+                    Air.IsEnabled = false;
+                    if (parent.Role == Role.Screener)
+                        Screen.IsEnabled = true;
+                    Hangup.IsEnabled = true;
+                    break;
+            }
+
+            if (parent.Role == Role.Screener)
+                Screen.Content = Line.State == LineState.Screening ? "UNSCREEN" : "SCREEN";
 
             if (Line.Caller == null)
             {
@@ -150,14 +225,14 @@ namespace Sift.Client.Elements
             Duration.Foreground = new SolidColorBrush(durationForeground[state]);
         }
 
-        private void Dump_Click(object sender, RoutedEventArgs e)
+        private void Hangup_Click(object sender, RoutedEventArgs e)
         {
             if (Line == null || Line.Caller == null)
                 return;
             parent.Client.Send(new RequestDump(Line.Index));
         }
 
-        private void ScreenToggle_Click(object sender, RoutedEventArgs e)
+        private void Screen_Click(object sender, RoutedEventArgs e)
         {
             if (Line == null || Line.Caller == null)
                 return;

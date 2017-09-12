@@ -85,9 +85,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Asterisk.cs" />
-    <Compile Include="AsteriskGroup.cs" />
-    <Compile Include="AsteriskLink.cs" />
+    <Compile Include="Asterisk\AsteriskProvider.cs" />
+    <Compile Include="Asterisk\AsteriskGroup.cs" />
+    <Compile Include="Asterisk\AsteriskLink.cs" />
     <Compile Include="DatabaseEngine.cs" />
     <Compile Include="LoginManager.cs" />
     <Compile Include="Program.cs" />
@@ -111,9 +111,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Schema\mysql.txt" />
     <EmbeddedResource Include="Schema\sqlite.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets')" />

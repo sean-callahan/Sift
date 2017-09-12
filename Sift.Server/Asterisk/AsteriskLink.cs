@@ -4,13 +4,13 @@ using AsterNET.ARI.Models;
 
 using Sift.Common;
 
-namespace Sift.Server
+namespace Sift.Server.Asterisk
 {
-    internal class AsteriskLink : IProviderLink<Asterisk>, IDisposable
+    internal class AsteriskLink : IProviderLink<AsteriskProvider>, IDisposable
     {
         public Guid Id { get; }
 
-        public Asterisk Provider { get; }
+        public AsteriskProvider Provider { get; }
 
         public Caller Originator { get; }
 
@@ -22,7 +22,7 @@ namespace Sift.Server
         private bool ended = false;
         public event EventHandler End;
 
-        public AsteriskLink(Program program, Asterisk asterisk, Caller c, string exten)
+        public AsteriskLink(Program program, AsteriskProvider asterisk, Caller c, string exten)
         {
             if (program.LinkedCallers.ContainsKey(c))
                 program.LinkedCallers[c].Dispose();
@@ -36,7 +36,7 @@ namespace Sift.Server
             
             this.program = program;
 
-            bridge = asterisk.Client.Bridges.Create("mixing", Id.ToString(), Asterisk.AppName);
+            bridge = asterisk.Client.Bridges.Create("mixing", Id.ToString(), AsteriskProvider.AppName);
             Provider.Client.OnBridgeDestroyedEvent += Client_OnBridgeDestroyedEvent;
         }
 
@@ -72,6 +72,8 @@ namespace Sift.Server
 
         private void Asterisk_CallerEnd(object sender, Caller e)
         {
+            if (e.Id != Originator.Id)
+                return;
             try
             {
                 Provider.Client.Channels.Hangup(Destination.Id);

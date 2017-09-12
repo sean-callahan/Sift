@@ -5,6 +5,7 @@ using Lidgren.Network;
 
 using Sift.Common;
 using Sift.Common.Network;
+using Sift.Server.Asterisk;
 using Sift.Server.Util;
 
 namespace Sift.Server
@@ -68,7 +69,7 @@ namespace Sift.Server
 
             Program.HoldGroup.Remove(line.Caller);
 
-            AsteriskLink link = new AsteriskLink(Program, (Asterisk)Program.Provider, Program.Lines[e.Index].Caller, "2001");
+            AsteriskLink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2001");
             link.Start();
 
             line.State = LineState.OnAir;
@@ -109,7 +110,7 @@ namespace Sift.Server
             line.State = LineState.Screening;
             Program.Server.Broadcast(new UpdateLineState(line));
 
-            AsteriskLink link = new AsteriskLink(Program, (Asterisk)Program.Provider, Program.Lines[e.Index].Caller, "2002");
+            AsteriskLink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2002");
             link.Start();
         }
 

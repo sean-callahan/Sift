@@ -10,6 +10,7 @@ using IniParser.Model;
 using MySql.Data.MySqlClient;
 using Sift.Common;
 using Sift.Common.Network;
+using Sift.Server.Asterisk;
 using Sift.Server.Util;
 
 namespace Sift.Server
