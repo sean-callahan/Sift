@@ -82,7 +82,6 @@ namespace Sift.Server.Asterisk
             if (e.Args.Count < 1 || !int.TryParse(e.Args[0], out argI) || callerRegistry.ContainsKey(e.Channel.Id))
                 return;
             StasisArgs arg = (StasisArgs)argI;
-            Console.WriteLine("stasis start with arg " + arg);
             switch (arg)
             {
                 case StasisArgs.Caller:
@@ -91,6 +90,7 @@ namespace Sift.Server.Asterisk
                         Number = e.Channel.Caller.Number,
                         Created = e.Channel.Creationtime
                     };
+                    Logger.Log(c, "New caller with ID: " + e.Channel.Id);
                     CallerStart?.Invoke(this, c);
                     callerRegistry[e.Channel.Id] = c;
                     break;
@@ -110,10 +110,11 @@ namespace Sift.Server.Asterisk
 
         private void Client_OnStasisEndEvent(IAriClient sender, StasisEndEvent e)
         {
-            Console.WriteLine("StasisEndEvent for " + e.Channel.Id);
             if (callerRegistry.ContainsKey(e.Channel.Id))
             {
-                CallerEnd?.Invoke(this, callerRegistry[e.Channel.Id]);
+                Caller c = callerRegistry[e.Channel.Id];
+                Logger.Log(c, "Caller hungup.");
+                CallerEnd?.Invoke(this, c);
                 callerRegistry.Remove(e.Channel.Id);
                 return;
             }

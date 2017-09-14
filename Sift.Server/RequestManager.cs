@@ -55,9 +55,15 @@ namespace Sift.Server
         {
             NetConnection conn = (NetConnection)sender;
             if (LoginManager.Login(Program.Database, user))
+            {
                 conn.Approve();
+                Logger.Log("Approved connection with username '" + user.Username + "'");
+            }
             else
+            {
                 conn.Deny("Invalid username or password");
+                Logger.Log("Denied connection with username '" + user.Username + "'");
+            }
         }
 
         private void Server_RequestAir(object sender, RequestAir e)
@@ -67,10 +73,23 @@ namespace Sift.Server
             if (line == null || line.Caller == null || Program.LinkedCallers.ContainsKey(line.Caller))
                 return;
 
-            Program.HoldGroup.Remove(line.Caller);
+            if (Program.HoldGroup.Contains(line.Caller))
+            {
+                Program.HoldGroup.Remove(line.Caller);
+                Logger.Log(line.Caller, "Removed from group " + Program.HoldGroup.Id);
+            }
 
-            AsteriskLink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2001");
+            if (Program.LinkedCallers.ContainsKey(line.Caller))
+            {
+                ILink existing = Program.LinkedCallers[line.Caller];
+                Logger.Log(line.Caller, "Already linked with linker " + existing.Id, Logger.Level.Warning);
+                return;
+            }
+
+            ILink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2001");
             link.Start();
+
+            Program.LinkedCallers[line.Caller] = link;
 
             line.State = LineState.OnAir;
             Program.Server.Broadcast(new UpdateLineState(line));
@@ -93,8 +112,20 @@ namespace Sift.Server
             if (!Program.LinkedCallers.TryGetValue(Program.Lines[e.Index].Caller, out link))
                 return;
             link.Dispose();
-                
-            Program.HoldGroup.Add(Program.Lines[e.Index].Caller);
+
+            Caller c = Program.Lines[e.Index].Caller;
+            if (c == null)
+                return;
+
+            if (Program.HoldGroup.Contains(c))
+            {
+                Logger.Log(c, "Already contained in group " + Program.HoldGroup.Id, Logger.Level.Warning);
+            }
+            else
+            {
+                Program.HoldGroup.Add(c);
+                Logger.Log(c, "Added to group " + Program.HoldGroup.Id);
+            }
 
             Program.Lines[e.Index].State = LineState.Hold;
             Program.Server.Broadcast(new UpdateLineState(Program.Lines[e.Index]));
@@ -104,14 +135,23 @@ namespace Sift.Server
         {
             Line line = Program.Lines[e.Index];
 
-            if (Program.LinkedCallers.ContainsKey(line.Caller))
+            if (line.Caller == null || Program.LinkedCallers.ContainsKey(line.Caller))
                 return;
             
             line.State = LineState.Screening;
             Program.Server.Broadcast(new UpdateLineState(line));
 
-            AsteriskLink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2002");
+            if (Program.LinkedCallers.ContainsKey(line.Caller))
+            {
+                ILink existing = Program.LinkedCallers[line.Caller];
+                Logger.Log(line.Caller, "Already linked with linker " + existing.Id, Logger.Level.Warning);
+                return;
+            }
+
+            ILink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2002");
             link.Start();
+            
+            Program.LinkedCallers[line.Caller] = link;
         }
 
         private void Server_RequestDump(object sender, RequestDump e)

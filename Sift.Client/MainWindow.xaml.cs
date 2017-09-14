@@ -50,9 +50,7 @@ namespace Sift.Client
                 Lines.Add(new Line(i));
 
             ConstructLineGrid(LineGrid, Lines, out elements);
-
             
-
             Client.UpdateLineState += Client_UpdateLineState;
             Client.Send(new RequestLine(-1)); // request all lines
 

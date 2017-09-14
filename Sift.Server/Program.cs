@@ -17,7 +17,7 @@ namespace Sift.Server
 {
     internal class Program
     {
-        public const string Version = "0.1.0";
+        public const string Version = "0.2.1";
 
         public static void Main(string[] args)
         {
@@ -47,6 +47,7 @@ namespace Sift.Server
         public IReadOnlyList<Line> Lines { get; }
 
         public IGroup HoldGroup { get; private set; }
+
         public Dictionary<Caller, ILink> LinkedCallers { get; } = new Dictionary<Caller, ILink>(); 
 
         public SdpServer Server { get; }
@@ -92,10 +93,10 @@ namespace Sift.Server
             switch (state)
             {
                 case VoipProviderConnectionState.Connecting:
-                    Console.WriteLine($"Trying to connect to {Provider.Name}...");
+                    Logger.Log($"Trying to connect to {Provider.Name}...");
                     break;
                 case VoipProviderConnectionState.Open:
-                    Console.WriteLine($"Connected to {Provider.Name}");
+                    Logger.Log($"Connected to {Provider.Name}");
                     break;
             }
         }
@@ -138,9 +139,15 @@ namespace Sift.Server
             {
                 if (Lines[i].Caller == c)
                 {
+                    if (HoldGroup.Contains(c))
+                        HoldGroup.Remove(c);
+                    if (LinkedCallers.ContainsKey(c))
+                    {
+                        LinkedCallers[c].Dispose();
+                    }
+
                     Lines[i].Caller = null;
                     Lines[i].State = LineState.Empty;
-                    Console.WriteLine("caller: removed from index " + i);
                     Server.Broadcast(new UpdateLineState(Lines[i]));
                     break;
                 }
@@ -165,7 +172,7 @@ namespace Sift.Server
             int next = NextLine;
             if (next < 0)
             {
-                Console.WriteLine("denying caller: lines are full");
+                Logger.Log(c, "Caller denied because lines are full.");
                 Provider.Hangup(c.Id);
                 return;
             }
@@ -174,7 +181,7 @@ namespace Sift.Server
             line.Caller = c;
             line.State = LineState.Ringing;
 
-            Console.WriteLine("caller: assigning index " + next);
+            Logger.Log(c, "Assigning line " + (line.Index + 1) + " to caller");
 
             Provider.Ring(c.Id);
 

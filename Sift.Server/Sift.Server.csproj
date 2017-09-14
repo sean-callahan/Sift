@@ -89,6 +89,7 @@
     <Compile Include="Asterisk\AsteriskGroup.cs" />
     <Compile Include="Asterisk\AsteriskLink.cs" />
     <Compile Include="DatabaseEngine.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="LoginManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

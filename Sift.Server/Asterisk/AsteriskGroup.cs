@@ -15,7 +15,6 @@ namespace Sift.Server.Asterisk
         public GroupType Type { get; }
 
         private AsteriskProvider asterisk;
-        private Bridge bridge;
 
         public AsteriskGroup(IVoipProvider provider, GroupType type)
         {
@@ -38,24 +37,42 @@ namespace Sift.Server.Asterisk
                     throw new Exception("Unsupported group type");
             }
             
-            bridge = asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), AsteriskProvider.AppName);
+            asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), AsteriskProvider.AppName);
 
             if (type == GroupType.Holding)
-                asterisk.Client.Bridges.StartMoh(bridge.Id, "default");
+                asterisk.Client.Bridges.StartMoh(Id.ToString(), "default");
         }
         
         public void Add(Caller c)
         {
-            asterisk.Client.Bridges.AddChannel(bridge.Id, c.Id);
+            try
+            {
+                asterisk.Client.Bridges.AddChannel(Id.ToString(), c.Id);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
         }
 
         public void Remove(Caller c)
         {
             try
             {
-                asterisk.Client.Bridges.RemoveChannel(bridge.Id, c.Id);
+                asterisk.Client.Bridges.RemoveChannel(Id.ToString(), c.Id);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
+
+        public bool Contains(Caller c)
+        {
+            Bridge b = asterisk.Client.Bridges.Get(Id.ToString());
+            if (b == null)
+                return false;
+            return b.Channels.Contains(c.Id);
         }
     }
 }

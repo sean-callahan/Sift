@@ -12,5 +12,7 @@ namespace Sift.Common
         void Add(Caller c);
 
         void Remove(Caller c);
+
+        bool Contains(Caller c);
     }
 }

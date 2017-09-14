@@ -37,10 +37,8 @@ namespace Sift.Common.Network
                     case NetIncomingMessageType.StatusChanged:
                         NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
                         string reason = im.ReadString();
-                        Console.WriteLine($"New status {status} ({reason})");
                         if (Peer.GetType() == typeof(NetClient))
                         {
-                            Debug.WriteLine($"New status {status} ({reason})");
                             if (status == NetConnectionStatus.Connected)
                                 ConnectionSuccess?.Invoke(im.SenderConnection, null);
                             if (status == NetConnectionStatus.Disconnected)
