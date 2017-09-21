@@ -21,7 +21,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Label Grid.Column="0" Grid.Row="0" Content="Screener Extension"/>
-            <TextBox Grid.Column="1" Grid.Row="0" Margin="5"/>
+            <TextBox Name="ScreenerExtensionBox"  Grid.Column="1" Grid.Row="0" Margin="5"/>
         </Grid>
         <Grid Grid.Column="1" Margin="5">
             <Grid.ColumnDefinitions>
@@ -35,10 +35,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Label Grid.Column="0" Grid.Row="0" Content="Hybrid Extensions"/>
-            <ListBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" />
-            <TextBox Grid.Column="0" Grid.Row="2" Margin="5"/>
-            <Button Grid.Column="1" Grid.Row="2" Margin="5" Width="75" HorizontalAlignment="Left" Content="Add"/>
-            <Button Grid.Column="1" Grid.Row="2" Margin="85,5,5,5" Width="75" HorizontalAlignment="Left" Content="Remove"/>
+            <ListBox Name="HybridsBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" />
+            <TextBox Name="HybridAddBox" Grid.Column="0" Grid.Row="2" Margin="5"/>
+            <Button Name="HybridAdd" Grid.Column="1" Grid.Row="2" Margin="5" Width="75" HorizontalAlignment="Left" Content="Add" Click="HybridAdd_Click"/>
+            <Button Name="HybridRemove" Grid.Column="1" Grid.Row="2" Margin="85,5,5,5" Width="75" HorizontalAlignment="Left" Content="Remove" Click="HybridRemove_Click"/>
             
         </Grid>
     </Grid>

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+
 using Lidgren.Network;
 
 namespace Sift.Common.Network
@@ -71,7 +70,7 @@ namespace Sift.Common.Network
                 return;
             }
 
-            User user = new User();
+            NetworkUser user = new NetworkUser();
             user.Decode(msg);
 
             RequestUserLogin?.Invoke(sender, user);
@@ -108,8 +107,11 @@ namespace Sift.Common.Network
                 case PacketType.ErrorPacket:
                     Error?.Invoke(msg.SenderConnection, new ErrorPacket(msg));
                     break;
-                case PacketType.SettingsChanged:
-                    SettingsChanged?.Invoke(msg.SenderConnection, new SettingsChanged(msg));
+                case PacketType.UpdateSettings:
+                    UpdateSettings?.Invoke(msg.SenderConnection, new UpdateSettings(msg));
+                    break;
+                case PacketType.RequestSettings:
+                    RequestSettings?.Invoke(msg.SenderConnection, new RequestSettings(msg));
                     break;
             }
         }
@@ -127,9 +129,10 @@ namespace Sift.Common.Network
         public event EventHandler<RequestHold> RequestHold;
         public event EventHandler<RequestLine> RequestLine;
         public event EventHandler<RequestAir> RequestAir;
-        public event EventHandler<User> RequestUserLogin;
+        public event EventHandler<NetworkUser> RequestUserLogin;
 
         public event EventHandler<ErrorPacket> Error;
-        public event EventHandler<SettingsChanged> SettingsChanged;
+        public event EventHandler<UpdateSettings> UpdateSettings;
+        public event EventHandler<RequestSettings> RequestSettings;
     }
 }

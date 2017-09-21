@@ -77,6 +77,7 @@
     <Compile Include="Elements\AsteriskSettingsElement.xaml.cs">
       <DependentUpon>AsteriskSettingsElement.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\ISettingsElement.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="VoipProviderSettingsWindow.xaml.cs">
       <DependentUpon>VoipProviderSettingsWindow.xaml</DependentUpon>

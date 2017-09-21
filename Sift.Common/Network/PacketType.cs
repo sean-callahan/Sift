@@ -13,6 +13,7 @@
         RequestAir,
 
         ErrorPacket,
-        SettingsChanged,
+        UpdateSettings,
+        RequestSettings,
     }
 }

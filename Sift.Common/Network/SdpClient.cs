@@ -25,12 +25,12 @@ namespace Sift.Common.Network
             Client?.Disconnect("Client closed");
         }
 
-        public void Connect(string address, int port, User user)
+        public void Connect(string address, int port, NetworkUser user)
         {
             Client.Connect(address, port, handshake(user));
         }
 
-        private NetOutgoingMessage handshake(User user)
+        private NetOutgoingMessage handshake(NetworkUser user)
         {
             NetOutgoingMessage msg = Peer.CreateMessage();
             msg.Write(App);

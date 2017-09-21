@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using Sift.Common;
 using Sift.Common.Network;
+using Sift.Server.Db;
 
 namespace Sift.Server
 {
@@ -14,6 +18,29 @@ namespace Sift.Server
             Program = program;
 
             Program.Server.UpdateLineState += Server_UpdateLineState;
+            Program.Server.UpdateSettings += Server_UpdateSettings;
+        }
+
+        private static IFormatter formatter = new BinaryFormatter();
+
+        private void Server_UpdateSettings(object sender, UpdateSettings e)
+        {
+            using (var ctx = new SettingContext())
+            {
+                foreach (NetworkSetting net in e.Items)
+                {
+                    Setting setting = ctx.Settings.Where(s => s.Key == net.Key).FirstOrDefault();
+                    if (setting == null)
+                        setting = new Setting
+                        {
+                            Key = net.Key,
+                            Category = net.Category,
+                        };
+                    setting.Value = net.Body;
+                    
+                }
+                ctx.SaveChanges();
+            }
         }
 
         private void Server_UpdateLineState(object sender, UpdateLineState e)

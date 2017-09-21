@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SQLite;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 using IniParser;
 using IniParser.Model;
-using MySql.Data.MySqlClient;
+
 using Sift.Common;
 using Sift.Common.Network;
 using Sift.Server.Asterisk;
-using Sift.Server.Util;
 
 namespace Sift.Server
 {
@@ -52,7 +49,7 @@ namespace Sift.Server
 
         public SdpServer Server { get; }
 
-        public DatabaseEngine Database { get; }
+        public static DatabaseEngine Database { get; private set; }
 
         public Program()
         {
@@ -62,20 +59,25 @@ namespace Sift.Server
 
             Provider = VoipProviderFactory.Create(data["Provider"]);
 
+            Logger.Log("Loading database...");
             Database = new DatabaseEngine(data["Database"]);
             Database.Initialize();
 
-            if (!LoginManager.HasUsername(Database, "admin"))
-                LoginManager.Create(Database, "admin", "changeme", 0);
+            if (!LoginManager.UserExists("admin"))
+            {
+                LoginManager.Create("admin", "changeme");
+                Logger.Log("Created 'admin' user account");
+            }
 
             List<Line> lines = new List<Line>(numLines);
 
             for (int i = 0; i < numLines; i++)
             {
                 lines.Add(new Line(i));
-            } 
+            }
 
             Lines = lines;
+            Logger.Log($"Initialized {numLines} lines");
 
             Provider.CallerStart += Provider_CallerStart;
             Provider.CallerEnd += Provider_CallerEnd;
@@ -117,6 +119,7 @@ namespace Sift.Server
             try
             {
                 HoldGroup = new AsteriskGroup(Provider, GroupType.Holding);
+                Logger.Log("Created hold group with ID " + HoldGroup.Id.ToString());
             }
             catch (Exception ex)
             {

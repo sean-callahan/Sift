@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using Lidgren.Network;
 
 using Sift.Common;
 using Sift.Common.Network;
 using Sift.Server.Asterisk;
-using Sift.Server.Util;
+using Sift.Server.Db;
 
 namespace Sift.Server
 {
@@ -25,36 +26,42 @@ namespace Sift.Server
             Program.Server.RequestLine += Server_RequestLine;
             Program.Server.RequestAir += Server_RequestAir;
             Program.Server.RequestUserLogin += Server_RequestUserLogin;
-            Program.Server.SettingsChanged += Server_SettingsChanged;
+            Program.Server.RequestSettings += Server_RequestSettings;
         }
 
-        private void Server_SettingsChanged(object sender, SettingsChanged e)
+        private void Server_RequestSettings(object sender, RequestSettings e)
         {
-            if (string.IsNullOrWhiteSpace(e.Category))
-                return;
-            using (IDbConnection db = Program.Database.NewConnection())
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (var ctx = new SettingContext())
             {
-                db.Open();
-                IDbCommand cmd = DbUtil.CreateCommand(db,
-                    "SELECT key, value FROM settings WHERE category=@category;",
-                    new Dictionary<string, object> { { "@category", e.Category } });
-                using (IDataReader reader = cmd.ExecuteReader())
+                Setting[] settings;
+                bool hasCategory = !string.IsNullOrWhiteSpace(e.Category);
+                bool hasKey = !string.IsNullOrWhiteSpace(e.Key);
+                if (hasCategory && !hasKey)
                 {
-                    Dictionary<string, object> items = new Dictionary<string, object>();
-                    while (reader.Read())
-                    {
-                        IDataRecord rec = reader;
-                        items.Add((string)rec["key"], rec["value"]);
-                    }
-                    Program.Server.Send((NetConnection)sender, new SettingsChanged(e.Category, new SettingsCollection(items)));
+                    settings = ctx.Settings.Where(s => s.Category == e.Category).ToArray();
                 }
+                else if (hasCategory && hasKey)
+                {
+                    settings = ctx.Settings.Where(s => s.Category == e.Category && s.Key == e.Key).ToArray();
+                }
+                else
+                {
+                    return;
+                }
+                NetworkSetting[] net = new NetworkSetting[settings.Length];
+                for (int i = 0; i < settings.Length; i++)
+                {
+                    net[i] = new NetworkSetting(settings[i].Category, settings[i].Key, settings[i].Value);
+                }
+                Program.Server.Send((NetConnection)sender, new UpdateSettings(net));
             }
         }
 
-        private void Server_RequestUserLogin(object sender, User user)
+        private void Server_RequestUserLogin(object sender, NetworkUser user)
         {
             NetConnection conn = (NetConnection)sender;
-            if (LoginManager.Login(Program.Database, user))
+            if (LoginManager.Login(user))
             {
                 conn.Approve();
                 Logger.Log("Approved connection with username '" + user.Username + "'");
@@ -148,7 +155,17 @@ namespace Sift.Server
                 return;
             }
 
-            ILink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, "2002");
+            string exten;
+            using (var ctx = new SettingContext())
+            {
+                var item = ctx.Settings.Where(x => x.Key == "asterisk_screener_extension").FirstOrDefault();
+                if (item == null)
+                    return;
+                NetworkSetting setting = item.ToNetworkSetting();
+                exten = ((int)setting.Value).ToString();
+            }
+
+            ILink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[e.Index].Caller, exten);
             link.Start();
             
             Program.LinkedCallers[line.Caller] = link;

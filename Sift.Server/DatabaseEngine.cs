@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Data.SQLite;
-using System.IO;
-using System.Reflection;
-using IniParser.Model;
+using System.Linq;
 
+using IniParser.Model;
 using MySql.Data.MySqlClient;
-using Sift.Server.Util;
+
+using Sift.Server.Db;
 
 namespace Sift.Server
 {
-    public struct DatabaseEngine
+    internal struct DatabaseEngine
     {
         private enum Types
         {
@@ -44,50 +44,16 @@ namespace Sift.Server
             ConnectionString = parsers[engine](data);
         }
 
-        public void Initialize()
-        {
-            using (IDbConnection db = NewConnection())
-            {
-                db.Open();
-
-                string fileName;
-                switch (engine)
-                {
-                    case Types.Sqlite:
-                        fileName = "sqlite.txt";
-                        break;
-                    case Types.MySql:
-                        fileName = "mysql.txt";
-                        break;
-                    default:
-                        fileName = "";
-                        break;
-                }
-
-                using (Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream("Sift.Server.Schema." + fileName))
-                {
-                    using (StreamReader r = new StreamReader(s))
-                    {
-                        while (r.Peek() >= 0)
-                        {
-                            string query = r.ReadLine();
-                            DbUtil.CreateCommand(db, query).ExecuteNonQuery();
-                        }
-                    }
-                }
-            }
-        }
-
-        public IDbConnection NewConnection()
+        public DbConnection CreateConnection()
         {
             switch (engine)
             {
-                case Types.Sqlite:
-                    return new SQLiteConnection(ConnectionString);
                 case Types.MySql:
                     return new MySqlConnection(ConnectionString);
+                case Types.Sqlite:
+                    return new SQLiteConnection(ConnectionString);
                 default:
-                    throw new Exception("Unsupported database engine");
+                    return null;
             }
         }
 
@@ -99,9 +65,31 @@ namespace Sift.Server
             return $"Data Source={file.Value.Trim()};Version=3;";
         }
 
+        internal void Initialize()
+        {
+            using (var ctx = new SettingContext())
+            {
+                foreach (var setting in SettingDefaults.settings)
+                {
+                    var result = ctx.Settings.Where(s => s.Category == setting.Category && s.Key == setting.Key).FirstOrDefault();
+                    if (result == null)
+                    {
+                        ctx.Settings.Add(setting);
+                    }
+                }
+                ctx.SaveChanges();
+            }
+        }
+
         private static string parseMySql(KeyDataCollection data)
         {
-            return $"server={data["host"]};user={data["user"]};database={data["database"]};port={data["port"]};password={data["password"]}";
+            MySqlConnectionStringBuilder b = new MySqlConnectionStringBuilder();
+            b.Port = uint.Parse(data["port"]);
+            b.UserID = data["user"];
+            b.Server = data["host"];
+            b.Database = data["database"];
+            b.Password = data["password"];
+            return b.ToString();
         }
     }
 }

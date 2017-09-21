@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
+
 using Sift.Client.Properties;
-using Sift.Common;
 using Sift.Common.Network;
 
 namespace Sift.Client
@@ -21,7 +21,7 @@ namespace Sift.Client
             Role.Screener
         };
 
-    public LoginWindow(SdpClient client)
+        public LoginWindow(SdpClient client)
         {
             Client = client;
             Client.Disconnected += Client_Disconnected;
@@ -64,7 +64,11 @@ namespace Sift.Client
             if (connectionSent)
                 return;
 
-            User u = User.Create(UsernameBox.Text, PasswordBox.Password);
+            NetworkUser u = new NetworkUser()
+            {
+                Username = UsernameBox.Text,
+                Password = PasswordBox.Password,
+            };
 
             Client.Connect(Settings.Default.Address, Settings.Default.Port, u);
             connectionSent = true;

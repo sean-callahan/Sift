@@ -16,7 +16,6 @@ namespace Sift.Client
         {
             Client = new SdpClient();
             
-
             ComponentDispatcher.ThreadIdle += (_, __) => Client.TryReadMessage();
         }
 

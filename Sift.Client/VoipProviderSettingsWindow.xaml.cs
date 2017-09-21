@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,48 +14,54 @@ namespace Sift.Client
     /// </summary>
     public partial class VoipProviderSettingsWindow : Window
     {
+        private static readonly IDictionary<VoipProviders, string> providerNames = new Dictionary<VoipProviders, string>()
+        {
+            { VoipProviders.Asterisk, "asterisk" },
+        };
+
         private SdpClient client;
         private VoipProviders provider;
+        private IDictionary<string, NetworkSetting> cache;
+        private ISettingsElement element;
 
         public VoipProviderSettingsWindow(SdpClient client, VoipProviders provider)
         {
             this.client = client;
             this.provider = provider;
-
-            client.SettingsChanged += Client_SettingsChanged;
+            
+            client.UpdateSettings += Client_UpdateSettings;
 
             InitializeComponent();
 
-            FetchSettings(SettingsCollection.Category[provider]);
+            client.Send(new RequestSettings() { Category = providerNames[provider] });
         }
 
-        private void Client_SettingsChanged(object sender, SettingsChanged e)
+        private void Client_UpdateSettings(object sender, UpdateSettings e)
         {
-            if (e.Category != SettingsCollection.Category[provider])
+            if (cache != null || e.Category != providerNames[provider])
                 return;
 
-            openElement(e.Settings);
+            cache = new Dictionary<string, NetworkSetting>();
+            foreach (NetworkSetting item in e.Items)
+                cache.Add(item.Key, item);
 
-            client.SettingsChanged -= Client_SettingsChanged;
+            client.UpdateSettings -= Client_UpdateSettings;
+
+            openElement(cache);
         }
 
-        private void FetchSettings(string category)
+        private void openElement(IDictionary<string, NetworkSetting> cache)
         {
-            client?.Send(new SettingsChanged(category));
-        }
-
-        private void openElement(SettingsCollection settings)
-        {
-            UserControl element;
             switch (provider)
             {
                 case VoipProviders.Asterisk:
-                    element = new AsteriskSettingsElement(settings);
+                    element = new AsteriskSettingsElement(client);
                     break;
                 default:
                     throw new Exception("Unknown VOIP provider");
             }
-            Element.Children.Add(element);
+            element.Load(cache);
+            Element.Children.Add((UserControl)element);
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -64,7 +71,7 @@ namespace Sift.Client
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Save
+            element.Save();
             Close();
         }
     }
