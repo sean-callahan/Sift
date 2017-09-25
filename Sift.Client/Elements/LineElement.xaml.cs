@@ -33,6 +33,12 @@ namespace Sift.Client.Elements
             }
         }
 
+        private enum ScreenButtonState
+        {
+            Screen,
+            Hold,
+        };
+
         private MainWindow parent;
         private bool showingBorder = false;
         private DateTime created;
@@ -155,7 +161,7 @@ namespace Sift.Client.Elements
             }
 
             if (parent.Role == Role.Screener)
-                Screen.Content = Line.State == LineState.Screening ? "UNSCREEN" : "SCREEN";
+                Screen.Content = Line.State == LineState.Screening ? "HOLD" : "SCREEN";
 
             if (Line.Caller == null)
             {
@@ -236,7 +242,10 @@ namespace Sift.Client.Elements
         {
             if (Line == null || Line.Caller == null)
                 return;
-            parent.Client.Send(new RequestScreen(Line.Index));
+            if (Line.State == LineState.Screening)
+                parent.Client.Send(new RequestHold(Line.Index));
+            else if (Line.State == LineState.Ringing)
+                parent.Client.Send(new RequestScreen(Line.Index));
         }
 
         private void Air_Click(object sender, RoutedEventArgs e)

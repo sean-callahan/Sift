@@ -77,9 +77,6 @@ namespace Sift.Client.Elements
             line.Caller.Comment = Comment.Text;
 
             client.Send(new UpdateLineState(line));
-
-            if (line.State == LineState.Screening)
-                client.Send(new RequestHold(line.Index));
         }
     }
 }

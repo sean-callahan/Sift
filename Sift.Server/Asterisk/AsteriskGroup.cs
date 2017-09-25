@@ -1,5 +1,5 @@
 ﻿using System;
-
+using AsterNET.ARI;
 using AsterNET.ARI.Models;
 
 using Sift.Common;
@@ -38,20 +38,28 @@ namespace Sift.Server.Asterisk
             }
             
             asterisk.Client.Bridges.Create(bridgeType, Id.ToString(), AsteriskProvider.AppName);
-
-            if (type == GroupType.Holding)
-                asterisk.Client.Bridges.StartMoh(Id.ToString(), "default");
         }
         
         public void Add(Caller c)
         {
             try
             {
+                Bridge b = asterisk.Client.Bridges.Get(Id.ToString());
+                if (b != null && b.Channels.Count < 1)
+                    asterisk.Client.Bridges.StartMoh(Id.ToString(), "default");
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex, Logger.Level.Warning);
+            }
+
+            try
+            {
                 asterisk.Client.Bridges.AddChannel(Id.ToString(), c.Id);
             }
             catch (Exception ex)
             {
-                Logger.Log(ex);
+                Logger.Log(ex, Logger.Level.Warning);
             }
         }
 
@@ -59,12 +67,30 @@ namespace Sift.Server.Asterisk
         {
             try
             {
-                asterisk.Client.Bridges.RemoveChannel(Id.ToString(), c.Id);
+                Bridge b = asterisk.Client.Bridges.Get(Id.ToString());
+                if (b != null && b.Channels.Count == 1)
+                    asterisk.Client.Bridges.StopMoh(Id.ToString());
             }
             catch (Exception ex)
             {
-                Logger.Log(ex);
+                Logger.Log(ex, Logger.Level.Warning);
             }
+
+            try
+            {
+                asterisk.Client.Bridges.RemoveChannel(Id.ToString(), c.Id);
+            }
+            catch (AriException ex)
+            {
+                if (ex.StatusCode != 404)
+                    Logger.Log(ex, Logger.Level.Warning);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex, Logger.Level.Warning);
+            }
+
+            
         }
 
         public bool Contains(Caller c)

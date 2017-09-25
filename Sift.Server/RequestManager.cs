@@ -31,6 +31,7 @@ namespace Sift.Server
 
         private void Server_RequestSettings(object sender, RequestSettings e)
         {
+            Logger.DebugLog("Requested settings " + (string.IsNullOrWhiteSpace(e.Key) ? "*" : e.Key) + " from " + (string.IsNullOrWhiteSpace(e.Category) ? "*" : e.Category));
             BinaryFormatter formatter = new BinaryFormatter();
             using (var ctx = new SettingContext())
             {
@@ -49,6 +50,9 @@ namespace Sift.Server
                 {
                     return;
                 }
+                Logger.DebugLog("Requested settings " + (string.IsNullOrWhiteSpace(e.Key) ? "*" : e.Key) + " from " + (string.IsNullOrWhiteSpace(e.Category) ? "*" : e.Category) + " retrieved " + settings.Length + " results");
+                if (settings.Length == 0)
+                    return;
                 NetworkSetting[] net = new NetworkSetting[settings.Length];
                 for (int i = 0; i < settings.Length; i++)
                 {

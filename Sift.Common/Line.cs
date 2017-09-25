@@ -5,6 +5,7 @@
         public int Index { get; }
 
         private Caller caller;
+
         public Caller Caller
         {
             get { return caller; }

@@ -77,12 +77,19 @@
     <Compile Include="Elements\AsteriskSettingsElement.xaml.cs">
       <DependentUpon>AsteriskSettingsElement.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\HybridElement.xaml.cs">
+      <DependentUpon>HybridElement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Elements\ISettingsElement.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="VoipProviderSettingsWindow.xaml.cs">
       <DependentUpon>VoipProviderSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Elements\AsteriskSettingsElement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Elements\HybridElement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

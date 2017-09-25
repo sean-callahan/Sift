@@ -1,5 +1,5 @@
 ﻿using System;
-
+using AsterNET.ARI;
 using AsterNET.ARI.Models;
 
 using Sift.Common;
@@ -62,6 +62,11 @@ namespace Sift.Server.Asterisk
             {
                 Provider.Client.Channels.Hangup(Destination.Id);
             }
+            catch (AriException ex)
+            {
+                if (ex.StatusCode != 404)
+                    Logger.Log(ex, Logger.Level.Warning);
+            }
             catch (Exception ex)
             {
                 Logger.Log(ex, Logger.Level.Warning);
@@ -80,6 +85,11 @@ namespace Sift.Server.Asterisk
             {
                 Provider.Client.Bridges.RemoveChannel(Id.ToString(), e.Id);
                 Provider.Client.Bridges.RemoveChannel(Id.ToString(), Originator.Id);
+            }
+            catch (AriException ex)
+            {
+                if (ex.StatusCode != 404)
+                    Logger.Log(ex, Logger.Level.Warning);
             }
             catch (Exception ex)
             {
@@ -109,6 +119,7 @@ namespace Sift.Server.Asterisk
                 program.LinkedCallers.Remove(Originator);
 
                 Provider.CallerEnd -= Asterisk_CallerEnd;
+                Provider.DestinationStart -= Asterisk_DestinationStart;
                 Provider.DestinationEnd -= Asterisk_DestinationEnd;
 
                 Provider.Client.Bridges.Destroy(Id.ToString());

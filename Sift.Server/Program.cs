@@ -14,7 +14,7 @@ namespace Sift.Server
 {
     internal class Program
     {
-        public const string Version = "0.2.1";
+        public const string Version = "0.2.2";
 
         public static void Main(string[] args)
         {

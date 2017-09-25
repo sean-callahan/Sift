@@ -64,7 +64,6 @@
     <Compile Include="Network\SdpServer.cs" />
     <Compile Include="Network\PacketTypes\ErrorPacket.cs" />
     <Compile Include="Network\PacketTypes\LoginRequest.cs" />
-    <Compile Include="Network\PacketTypes\ProviderSettings.cs" />
     <Compile Include="Network\PacketTypes\RequestAir.cs" />
     <Compile Include="Network\PacketTypes\RequestDump.cs" />
     <Compile Include="Network\PacketTypes\RequestHold.cs" />

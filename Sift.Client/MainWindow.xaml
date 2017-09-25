@@ -24,11 +24,16 @@
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1" Margin="10">
             <Grid.RowDefinitions>
+                <RowDefinition Height="300"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
-            <Frame x:Name="ScreenerFrame"></Frame>
-            <Label x:Name="ConnectionStatus" Grid.Column="1" Grid.Row="1" Content="DISCONNECTED" HorizontalContentAlignment="Right" FontFamily="Calibri" FontWeight="Bold" Foreground="#FF990000" FontSize="14" VerticalContentAlignment="Bottom" />
+            <Frame Grid.Row="0" x:Name="ScreenerFrame"></Frame>
+            <Label Grid.Row="1" Content="Hybrids" FontSize="14" Foreground="Gray" />
+            <Frame Grid.Row="2" x:Name="HybridsFrame">
+            </Frame>
+            <Label x:Name="ConnectionStatus" Grid.Column="1" Grid.Row="3" Content="DISCONNECTED" HorizontalContentAlignment="Right" FontFamily="Calibri" FontWeight="Bold" Foreground="#FF990000" FontSize="14" VerticalContentAlignment="Bottom" />
         </Grid>
     </Grid>
 </Window>

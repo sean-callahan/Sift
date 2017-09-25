@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,6 +22,7 @@ namespace Sift.Client
         public Line SelectedLine { get; private set; }
 
         public ScreenerElement Screener { get; }
+        public IList<HybridElement> Hybrids { get; private set; }
 
         public SdpClient Client { get; }
 
@@ -37,6 +40,8 @@ namespace Sift.Client
         private VoipProviders provider;
         private IDictionary<Line, LineElement> elements;
 
+        private bool hybridsCreated = false;
+
         public MainWindow(SdpClient client, VoipProviders provider, int lines, Role role)
         {
             this.provider = provider;
@@ -49,13 +54,6 @@ namespace Sift.Client
             for (int i = 0; i < lines; i++)
                 Lines.Add(new Line(i));
 
-            ConstructLineGrid(LineGrid, Lines, out elements);
-            
-            Client.UpdateLineState += Client_UpdateLineState;
-            Client.Send(new RequestLine(-1)); // request all lines
-
-            HasConnection = true;
-
             if (Role == Role.Screener)
             {
                 Screener = new ScreenerElement(Client);
@@ -63,8 +61,58 @@ namespace Sift.Client
                 Grid.SetColumn(Screener, 0);
                 ScreenerFrame.Content = Screener;
             }
+
+            if (Lines.Count > 0)
+                SelectLine(Lines[0]);
+
+            ConstructLineGrid(LineGrid, Lines, out elements);
             
-            SelectLine(Lines[0]);
+            Client.UpdateLineState += Client_UpdateLineState;
+            Client.UpdateSettings += Client_UpdateSettings;
+            Client.Send(new RequestLine(-1)); // request all lines
+            Client.Send(new RequestSettings()
+            {
+                Key = "asterisk_hybrid_extensions",
+                Category = "asterisk",
+            });
+
+            HasConnection = true;
+        }
+
+        private void Client_UpdateSettings(object sender, UpdateSettings e)
+        {
+            if (hybridsCreated || e.Key != "asterisk_hybrid_extensions" || e.Items.Count < 1)
+                return;
+
+            hybridsCreated = true;
+
+            NetworkSetting setting = e.Items.First();
+            int[] hybrids = (int[])setting.Value;
+
+            Grid grid = CreateHybridGrid(hybrids);
+            HybridsFrame.Content = grid;
+        }
+
+        private Grid CreateHybridGrid(int[] hybrids)
+        {
+            Grid grid = new Grid();
+
+            Array.Sort(hybrids);
+
+            for (int i = 0; i < hybrids.Length; i++)
+            {
+                grid.RowDefinitions.Add(new RowDefinition()
+                {
+                    Height = new GridLength(40),
+                });
+                HybridElement el = new HybridElement(hybrids[i].ToString());
+                Grid.SetRow(el, i);
+                grid.Children.Add(el);
+            }
+
+            grid.RowDefinitions.Add(new RowDefinition());
+
+            return grid;
         }
 
         private void Client_UpdateLineState(object sender, UpdateLineState e)

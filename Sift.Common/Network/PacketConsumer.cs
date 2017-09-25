@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Diagnostics;
 using Lidgren.Network;
 
 namespace Sift.Common.Network
@@ -78,6 +78,8 @@ namespace Sift.Common.Network
 
         private void handlePacket(PacketType type, NetIncomingMessage msg)
         {
+            Debug.WriteLine("Got a " + type);
+
             switch (type)
             {
                 case PacketType.UpdateAppState:
