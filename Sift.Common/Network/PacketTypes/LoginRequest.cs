@@ -1,8 +1,6 @@
-﻿using Lidgren.Network;
-
-namespace Sift.Common.Network
+﻿namespace Sift.Common.Network
 {
-    public class LoginRequest : IPacket
+    /*public class LoginRequest : IPacket
     {
         public PacketType Type => PacketType.LoginRequest;
 
@@ -19,5 +17,5 @@ namespace Sift.Common.Network
         public void Encode(NetOutgoingMessage msg)
         {
         }
-    }
+    }*/
 }

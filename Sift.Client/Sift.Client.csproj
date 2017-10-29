@@ -51,9 +51,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -81,7 +78,11 @@
       <DependentUpon>HybridElement.xaml</DependentUpon>
     </Compile>
     <Compile Include="Elements\ISettingsElement.cs" />
+    <Compile Include="NetworkStatisticsWindow.xaml.cs">
+      <DependentUpon>NetworkStatisticsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Role.cs" />
+    <Compile Include="SdpClient.cs" />
     <Compile Include="VoipProviderSettingsWindow.xaml.cs">
       <DependentUpon>VoipProviderSettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -137,6 +138,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="NetworkStatisticsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="VoipProviderSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -163,9 +168,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

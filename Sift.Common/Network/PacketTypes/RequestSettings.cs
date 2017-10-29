@@ -1,8 +1,6 @@
-﻿using Lidgren.Network;
-
-namespace Sift.Common.Network
+﻿namespace Sift.Common.Network
 {
-    public class RequestSettings : IPacket
+    /*public class RequestSettings : IPacket
     {
         public string Category;
         public string Key;
@@ -26,5 +24,5 @@ namespace Sift.Common.Network
             msg.Write(Category);
             msg.Write(Key);
         }
-    }
+    }*/
 }

@@ -7,17 +7,24 @@ using IniParser;
 using IniParser.Model;
 
 using Sift.Common;
-using Sift.Common.Network;
+using Sift.Common.Net;
 using Sift.Server.Asterisk;
 
 namespace Sift.Server
 {
     internal class Program
     {
-        public const string Version = "0.2.2";
+        public const string Version = "0.3.1";
 
         public static void Main(string[] args)
         {
+            ManualResetEvent exit = new ManualResetEvent(false);
+            Console.CancelKeyPress += (_, e) =>
+            {
+                e.Cancel = true;
+                exit.Set();
+            };
+
             string motd = "    __________________\n" +
                 "   / __/  _/ __/_  __/\n" +
                 "  _\\ \\_/ // _/  / /    Call Screener\n" +
@@ -28,13 +35,11 @@ namespace Sift.Server
             {
                 Program p = new Program();
                 p.Connect();
-                CancellationTokenSource cts = new CancellationTokenSource();
-                p.ProcessLoop(cts.Token);
+                p.ProcessNetwork(exit);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Console.ReadLine();
             }
         }
 
@@ -45,7 +50,7 @@ namespace Sift.Server
 
         public IGroup HoldGroup { get; private set; }
 
-        public Dictionary<Caller, ILink> LinkedCallers { get; } = new Dictionary<Caller, ILink>(); 
+        public Dictionary<Caller, ILink> LinkedCallers { get; } = new Dictionary<Caller, ILink>();
 
         public SdpServer Server { get; }
 
@@ -60,9 +65,18 @@ namespace Sift.Server
             Provider = VoipProviderFactory.Create(data["Provider"]);
 
             Logger.Log("Loading database...");
-            Database = new DatabaseEngine(data["Database"]);
-            Database.Initialize();
-
+            try
+            {
+                Database = new DatabaseEngine(data["Database"]);
+                Database.Initialize();
+            }
+            catch (Exception e)
+            {
+                Logger.Log("Could not connect to database.", Logger.Level.Error);
+                Logger.Log(e.InnerException);
+                return;
+            }
+            
             if (!LoginManager.UserExists("admin"))
             {
                 LoginManager.Create("admin", "changeme");
@@ -70,8 +84,7 @@ namespace Sift.Server
             }
 
             List<Line> lines = new List<Line>(numLines);
-
-            for (int i = 0; i < numLines; i++)
+            for (byte i = 0; i < numLines; i++)
             {
                 lines.Add(new Line(i));
             }
@@ -82,12 +95,38 @@ namespace Sift.Server
             Provider.CallerStart += Provider_CallerStart;
             Provider.CallerEnd += Provider_CallerEnd;
             Provider.ConnectionStateChanged += Provider_ConnectionStateChanged;
-            
+
             Server = new SdpServer(7777);
+            Server.Manager.Connection += ServerConnection;
+            Server.Manager.Disconnected += ServerDisconnection;
             Server.Start();
 
             new RequestManager(this);
             new UpdateManager(this);
+        }
+
+        private void ServerConnection(string id)
+        {
+            Logger.Log("Client connected with ID = " + id);
+        }
+
+        private void ServerDisconnection(string id)
+        {
+            Logger.Log("Client with ID = " + id + " disconnected.");
+        }
+
+        private void ProcessNetwork(ManualResetEvent exit)
+        {
+            Tuple<string, ISdpPacket> p;
+            while (!exit.WaitOne(1))
+            {
+                if (!Server.Manager.IncomingPackets.TryDequeue(out p))
+                    continue;
+
+                Logger.Log("Got packet " + p.Item2.Type, Logger.Level.Debug);
+
+                Server.Manager.HandlePacket(p.Item1, p.Item2);
+            }
         }
 
         private void Provider_ConnectionStateChanged(object sender, VoipProviderConnectionState state)
@@ -99,6 +138,16 @@ namespace Sift.Server
                     break;
                 case VoipProviderConnectionState.Open:
                     Logger.Log($"Connected to {Provider.Name}");
+                    break;
+                case VoipProviderConnectionState.Closed:
+                    Server.Broadcast(new Error
+                    {
+                        Message = "Provider connection lost.",
+                        Detail = $"The connection to the provider {Provider.Name} has been lost. " +
+                            "To continue using Sift, please restart the server appplication and wait for a successful provider connection. " +
+                            "Please restart all clients once the server application has been restarted.",
+                        Fatal = true,
+                    });
                     break;
             }
         }
@@ -113,7 +162,7 @@ namespace Sift.Server
                 tries++;
                 if (tries > 40)
                     throw new Exception($"Could not connect to {Provider.Name}");
-                await Task.Delay(250);
+                await Task.Delay(1000);
             }
 
             try
@@ -127,33 +176,23 @@ namespace Sift.Server
             }
         }
 
-        public void ProcessLoop(CancellationToken cancel)
-        {
-            while (!cancel.IsCancellationRequested)
-            {
-                Server.TryReadMessage();
-                Thread.Sleep(1);
-            }
-        }
-
         private void Provider_CallerEnd(object sender, Caller c)
         {
-            for (int i = 0; i < Lines.Count; i++)
+            foreach (Line line in Lines)
             {
-                if (Lines[i].Caller == c)
-                {
-                    if (HoldGroup.Contains(c))
-                        HoldGroup.Remove(c);
-                    if (LinkedCallers.ContainsKey(c))
-                    {
-                        LinkedCallers[c].Dispose();
-                    }
+                if (line.Caller != c)
+                    continue;
 
-                    Lines[i].Caller = null;
-                    Lines[i].State = LineState.Empty;
-                    Server.Broadcast(new UpdateLineState(Lines[i]));
-                    break;
-                }
+                if (HoldGroup.Contains(c))
+                    HoldGroup.Remove(c);
+                if (LinkedCallers.ContainsKey(c))
+                    LinkedCallers[c].Dispose();
+
+                line.Caller = null;
+                line.State = LineState.Empty;
+                Server.Broadcast(new LineStateChanged(line));
+
+                break;
             }
         }
 
@@ -188,7 +227,7 @@ namespace Sift.Server
 
             Provider.Ring(c.Id);
 
-            Server.Broadcast(new UpdateLineState(line));
+            Server.Broadcast(new InitializeLine(line));
         }
 
         private static FileIniDataParser parser = new FileIniDataParser();

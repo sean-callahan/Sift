@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Lidgren.Network;
 
 namespace Sift.Common.Network
 {
-    public class ErrorPacket : IPacket
+    /*public class ErrorPacket : IPacket
     {
         public string Message;
         public string StackTrace;
@@ -37,5 +36,5 @@ namespace Sift.Common.Network
             msg.Write(Message);
             msg.Write(StackTrace);
         }
-    }
+    }*/
 }

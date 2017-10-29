@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+
 using Sift.Common;
-using Sift.Common.Network;
+using Sift.Common.Net;
 
 namespace Sift.Client.Elements
 {
@@ -235,7 +235,12 @@ namespace Sift.Client.Elements
         {
             if (Line == null || Line.Caller == null)
                 return;
-            parent.Client.Send(new RequestDump(Line.Index));
+
+            parent.Client.Send(new LineAction
+            {
+                Index = Line.Index,
+                Action = LineActions.Dump,
+            });
         }
 
         private void Screen_Click(object sender, RoutedEventArgs e)
@@ -243,16 +248,28 @@ namespace Sift.Client.Elements
             if (Line == null || Line.Caller == null)
                 return;
             if (Line.State == LineState.Screening)
-                parent.Client.Send(new RequestHold(Line.Index));
+                parent.Client.Send(new LineAction
+                {
+                    Index = Line.Index,
+                    Action = LineActions.Hold,
+                });
             else if (Line.State == LineState.Ringing)
-                parent.Client.Send(new RequestScreen(Line.Index));
+                parent.Client.Send(new LineAction
+                {
+                    Index = Line.Index,
+                    Action = LineActions.Screen,
+                });
         }
 
         private void Air_Click(object sender, RoutedEventArgs e)
         {
             if (Line == null || Line.Caller == null)
                 return;
-            parent.Client.Send(new RequestAir(Line.Index));
+            parent.Client.Send(new LineAction
+            {
+                Index = Line.Index,
+                Action = LineActions.Air,
+            });
         }
     }
 }

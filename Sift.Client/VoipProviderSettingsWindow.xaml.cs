@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 using Sift.Client.Elements;
 using Sift.Common;
-using Sift.Common.Network;
+using Sift.Common.Net;
 
 namespace Sift.Client
 {
@@ -21,22 +21,22 @@ namespace Sift.Client
 
         private SdpClient client;
         private VoipProviders provider;
-        private IDictionary<string, NetworkSetting> cache;
-        private ISettingsElement element;
+        //private IDictionary<string, NetworkSetting> cache;
+        //private ISettingsElement element;
 
         public VoipProviderSettingsWindow(SdpClient client, VoipProviders provider)
         {
             this.client = client;
             this.provider = provider;
             
-            client.UpdateSettings += Client_UpdateSettings;
+            //client.UpdateSettings += Client_UpdateSettings;
 
             InitializeComponent();
 
-            client.Send(new RequestSettings() { Category = providerNames[provider] });
+            //client.Send(new RequestSettings() { Category = providerNames[provider] });
         }
 
-        private void Client_UpdateSettings(object sender, UpdateSettings e)
+        /*private void Client_UpdateSettings(object sender, UpdateSettings e)
         {
             if (cache != null || e.Category != providerNames[provider])
                 return;
@@ -45,7 +45,7 @@ namespace Sift.Client
             foreach (NetworkSetting item in e.Items)
                 cache.Add(item.Key, item);
 
-            client.UpdateSettings -= Client_UpdateSettings;
+            //client.UpdateSettings -= Client_UpdateSettings;
 
             openElement(cache);
         }
@@ -63,7 +63,7 @@ namespace Sift.Client
             element.Load(cache);
             Element.Children.Add((UserControl)element);
         }
-
+        */
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -71,7 +71,7 @@ namespace Sift.Client
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            element.Save();
+            //element.Save();
             Close();
         }
     }

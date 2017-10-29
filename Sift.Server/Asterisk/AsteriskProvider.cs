@@ -74,7 +74,11 @@ namespace Sift.Server.Asterisk
             ConnectionStateChanged?.Invoke(this, state);
         }
 
-        public override void Connect() => Client.Connect();
+        public override void Connect()
+        {
+            Client.Connect();
+            Logger.Log(Client.Asterisk.GetInfo().Build.Date);
+        }
 
         private void Client_OnStasisStartEvent(IAriClient sender, StasisStartEvent e)
         {

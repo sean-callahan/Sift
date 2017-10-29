@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Sift.Common.Network;
+
+using Sift.Common.Net;
 using Sift.Server.Util;
 
 namespace Sift.Server.Db

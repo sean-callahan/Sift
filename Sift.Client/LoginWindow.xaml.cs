@@ -2,6 +2,7 @@
 using System.Windows;
 
 using Sift.Client.Properties;
+using Sift.Common.Net;
 using Sift.Common.Network;
 
 namespace Sift.Client
@@ -24,12 +25,12 @@ namespace Sift.Client
         public LoginWindow(SdpClient client)
         {
             Client = client;
-            Client.Disconnected += Client_Disconnected;
-            Client.ConnectionSuccess += Client_ConnectionSuccess;
-            Client.UpdateAppState += Client_UpdateAppState;
-            Client.Error += Client_Error;
+            Client.Manager.InitializeClient += InitializeClient;
+            Client.Manager.Error += Client_Error;
 
             InitializeComponent();
+
+            Title = "Sift " + App.Version + " - Login";
 
             LoginAs.ItemsSource = possibleRoles;
             LoginAs.SelectedIndex = 0;
@@ -39,23 +40,23 @@ namespace Sift.Client
         {
             connectionSent = false;
 
-            App.ShowError("Could not connect to server.", reason);
+            App.DisplayError("Could not connect to server.", reason);
         }
 
         private void Client_ConnectionSuccess(object sender, EventArgs e)
         {
-            Client.Send(new LoginRequest());
+            //Client.Send(new LoginRequest());
         }
 
-        private void Client_Error(object sender, ErrorPacket e) => App.ShowError(e.Message, e.StackTrace);
+        private void Client_Error(string id, Error e) => App.DisplayError(e.Message, e.Detail);
 
-        private void Client_UpdateAppState(object sender, UpdateAppState e)
+        private void InitializeClient(string id, InitializeClient e)
         {
             if (Client == null)
                 return;
-            if (e.LineCount < 1 || e.LineCount > 20)
+            if (e.Lines < 1 || e.Lines > 20)
                 throw new Exception("Received an invalid line count");
-            new MainWindow(Client, e.ProviderType, e.LineCount, (Role)LoginAs.SelectedItem).Show();
+            new MainWindow(Client, e.Provider, e.Lines, Role.Screener).Show();
             Close();
         }
 
@@ -70,7 +71,7 @@ namespace Sift.Client
                 Password = PasswordBox.Password,
             };
 
-            Client.Connect(Settings.Default.Address, Settings.Default.Port, u);
+            Client.Connect(Properties.Settings.Default.Address, Properties.Settings.Default.Port);
             connectionSent = true;
         }
 

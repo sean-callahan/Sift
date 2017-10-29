@@ -2,11 +2,9 @@
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-using Lidgren.Network;
-
 namespace Sift.Common.Network
 {
-    public class NetworkSetting : ICodec
+    /*public class NetworkSetting : ICodec
     {
         public string Category;
 
@@ -63,5 +61,5 @@ namespace Sift.Common.Network
                 return serializer.Deserialize(stream);
             }
         }
-    }
+    }*/
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 
-using Sift.Common.Network;
+using Sift.Common.Net;
 
 namespace Sift.Client.Elements
 {
@@ -32,7 +32,7 @@ namespace Sift.Client.Elements
             int exten;
             if (!int.TryParse(text, out exten))
             {
-                App.ShowError("Could not parse extension.", "Extension must be a number.");
+                App.DisplayError("Could not parse extension.", "Extension must be a number.");
                 return;
             }
             HybridsBox.Items.Add(exten);
@@ -66,9 +66,7 @@ namespace Sift.Client.Elements
             cache["asterisk_hybrid_extensions"].Value = hybrids;
             cache["asterisk_screener_extension"].Value = int.Parse(ScreenerExtensionBox.Text);
 
-            client.Send(new UpdateSettings(cache.Values));
+            //client.Send(new UpdateSettings(cache.Values));
         }
-
-        
     }
 }

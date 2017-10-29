@@ -147,5 +147,17 @@
             <Setter Property="BorderBrush" Value="#FF424242" />
             <Setter Property="Foreground" Value="LightGray" />
         </Style>
+        <Style TargetType="{x:Type Menu}">
+            <Setter Property="Background" Value="#1F1F1F" />
+            <Setter Property="BorderBrush" Value="#1F1F1F" />
+            <Setter Property="Foreground" Value="LightGray" />
+        </Style>
+        <Style TargetType="{x:Type MenuItem}">
+            <Setter Property="Background" Value="#1F1F1F" />
+            <Setter Property="BorderBrush" Value="#1F1F1F" />
+            <Setter Property="Foreground" Value="LightGray" />
+            <Setter Property="Margin" Value="2,0,2,0" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
     </Application.Resources>
 </Application>

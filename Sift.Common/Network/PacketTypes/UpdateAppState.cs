@@ -1,17 +1,15 @@
-﻿using Lidgren.Network;
-
-namespace Sift.Common.Network
+﻿namespace Sift.Common.Network
 {
-    public class UpdateAppState : IPacket
+    /*public class UpdateAppState : IPacket
     {
-        public ushort LineCount;
+        public byte Lines;
         public VoipProviders ProviderType;
 
         public PacketType Type => PacketType.UpdateAppState;
 
-        public UpdateAppState(int lineCount, VoipProviders providerType)
+        public UpdateAppState(byte lines, VoipProviders providerType)
         {
-            LineCount = (ushort)lineCount;
+            Lines = lines;
             ProviderType = providerType;
         }
 
@@ -19,14 +17,14 @@ namespace Sift.Common.Network
 
         public void Decode(NetIncomingMessage msg)
         {
-            LineCount = msg.ReadUInt16();
+            Lines = msg.ReadByte();
             ProviderType = (VoipProviders)msg.ReadByte();
         }
 
         public void Encode(NetOutgoingMessage msg)
         {
-            msg.Write(LineCount);
+            msg.Write(Lines);
             msg.Write((byte)ProviderType);
         }
-    }
+    }*/
 }

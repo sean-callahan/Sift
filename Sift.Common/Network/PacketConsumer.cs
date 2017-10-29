@@ -1,56 +1,51 @@
 ﻿using System;
 using System.Diagnostics;
-using Lidgren.Network;
 
 namespace Sift.Common.Network
 {
-    public abstract class PacketConsumer
+    /*public abstract class PacketConsumer
     {
         public const string App = "sift";
         public const byte Version = 0;
 
         protected abstract NetPeer Peer { get; }
 
-        public void TryReadMessage()
+        protected void GotMessage(object peer)
         {
-            NetIncomingMessage im;
-            while ((im = Peer.ReadMessage()) != null)
+            var im = ((NetPeer)peer).ReadMessage();
+            switch (im.MessageType)
             {
-                switch (im.MessageType)
-                {
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Error?.Invoke(this, new ErrorPacket(new Exception(im.ReadString())));
-                        break;
-                    case NetIncomingMessageType.Data:
-                        PacketType type = (PacketType)im.ReadByte();
-                        try
-                        {
-                            handlePacket(type, im);
-                        }
-                        catch (Exception ex)
-                        {
-                            Error?.Invoke(this, new ErrorPacket(ex));
-                        }
-                        break;
-                    case NetIncomingMessageType.StatusChanged:
-                        NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
-                        string reason = im.ReadString();
-                        if (Peer.GetType() == typeof(NetClient))
-                        {
-                            if (status == NetConnectionStatus.Connected)
-                                ConnectionSuccess?.Invoke(im.SenderConnection, null);
-                            if (status == NetConnectionStatus.Disconnected)
-                                Disconnected?.Invoke(this, reason);
-                        }
-                        break;
-                    case NetIncomingMessageType.ConnectionApproval:
-                        vetConnection(im.SenderConnection, im);
-                        break;
-                    default:
-                        break;
-                }
-                Peer.Recycle(im);
+                case NetIncomingMessageType.WarningMessage:
+                case NetIncomingMessageType.ErrorMessage:
+                    Error?.Invoke(this, new ErrorPacket(new Exception(im.ReadString())));
+                    break;
+                case NetIncomingMessageType.Data:
+                    PacketType type = (PacketType)im.ReadByte();
+                    try
+                    {
+                        handlePacket(type, im);
+                    }
+                    catch (Exception ex)
+                    {
+                        Error?.Invoke(this, new ErrorPacket(ex));
+                    }
+                    break;
+                case NetIncomingMessageType.StatusChanged:
+                    NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
+                    string reason = im.ReadString();
+                    if (peer.GetType() == typeof(NetClient))
+                    {
+                        if (status == NetConnectionStatus.Connected)
+                            ConnectionSuccess?.Invoke(im.SenderConnection, null);
+                        if (status == NetConnectionStatus.Disconnected)
+                            Disconnected?.Invoke(this, reason);
+                    }
+                    break;
+                case NetIncomingMessageType.ConnectionApproval:
+                    vetConnection(im.SenderConnection, im);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -85,26 +80,26 @@ namespace Sift.Common.Network
                 case PacketType.UpdateAppState:
                     UpdateAppState?.Invoke(msg.SenderConnection, new UpdateAppState(msg));
                     break;
-                case PacketType.UpdateLineState:
-                    UpdateLineState?.Invoke(msg.SenderConnection, new UpdateLineState(msg));
+                case PacketType.InitializeLine:
+                    InitializeLine?.Invoke(msg.SenderConnection, new InitializeLine(msg));
                     break;
                 case PacketType.LoginRequest:
                     LoginRequest?.Invoke(msg.SenderConnection, new LoginRequest(msg));
                     break;
-                case PacketType.RequestDump:
-                    RequestDump?.Invoke(msg.SenderConnection, new RequestDump(msg));
+                case PacketType.DumpLine:
+                    DumpLine?.Invoke(msg.SenderConnection, new DumpLine(msg));
                     break;
-                case PacketType.RequestScreen:
-                    RequestScreen?.Invoke(msg.SenderConnection, new RequestScreen(msg));
+                case PacketType.ScreenLine:
+                    ScreenLine?.Invoke(msg.SenderConnection, new ScreenLine(msg));
                     break;
-                case PacketType.RequestHold:
-                    RequestHold?.Invoke(msg.SenderConnection, new RequestHold(msg));
+                case PacketType.HoldLine:
+                    HoldLine?.Invoke(msg.SenderConnection, new HoldLine(msg));
                     break;
-                case PacketType.RequestLine:
-                    RequestLine?.Invoke(msg.SenderConnection, new RequestLine(msg));
+                case PacketType.LineRequest:
+                    LineRequest?.Invoke(msg.SenderConnection, new LineRequest(msg));
                     break;
-                case PacketType.RequestAir:
-                    RequestAir?.Invoke(msg.SenderConnection, new RequestAir(msg));
+                case PacketType.AirLine:
+                    AirLine?.Invoke(msg.SenderConnection, new AirLine(msg));
                     break;
                 case PacketType.ErrorPacket:
                     Error?.Invoke(msg.SenderConnection, new ErrorPacket(msg));
@@ -115,6 +110,9 @@ namespace Sift.Common.Network
                 case PacketType.RequestSettings:
                     RequestSettings?.Invoke(msg.SenderConnection, new RequestSettings(msg));
                     break;
+                case PacketType.LineMetadata:
+                    LineMetadata?.Invoke(msg.SenderConnection, new LineMetadata(msg));
+                    break;
             }
         }
 
@@ -123,18 +121,19 @@ namespace Sift.Common.Network
         public event EventHandler ConnectionSuccess;
         
         public event EventHandler<UpdateAppState> UpdateAppState;
-        public event EventHandler<UpdateLineState> UpdateLineState;
+        public event EventHandler<InitializeLine> InitializeLine;
 
         public event EventHandler<LoginRequest> LoginRequest;
-        public event EventHandler<RequestDump> RequestDump;
-        public event EventHandler<RequestScreen> RequestScreen;
-        public event EventHandler<RequestHold> RequestHold;
-        public event EventHandler<RequestLine> RequestLine;
-        public event EventHandler<RequestAir> RequestAir;
+        public event EventHandler<DumpLine> DumpLine;
+        public event EventHandler<ScreenLine> ScreenLine;
+        public event EventHandler<HoldLine> HoldLine;
+        public event EventHandler<LineRequest> LineRequest;
+        public event EventHandler<AirLine> AirLine;
         public event EventHandler<NetworkUser> RequestUserLogin;
 
         public event EventHandler<ErrorPacket> Error;
         public event EventHandler<UpdateSettings> UpdateSettings;
         public event EventHandler<RequestSettings> RequestSettings;
-    }
+        public event EventHandler<LineMetadata> LineMetadata;
+    }*/
 }

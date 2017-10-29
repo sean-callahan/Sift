@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 using Sift.Client.Elements;
 using Sift.Common;
-using Sift.Common.Network;
+using Sift.Common.Net;
 
 namespace Sift.Client
 {
@@ -23,7 +23,7 @@ namespace Sift.Client
 
         public ScreenerElement Screener { get; }
         public IList<HybridElement> Hybrids { get; private set; }
-
+        
         public SdpClient Client { get; }
 
         public bool HasConnection
@@ -51,7 +51,7 @@ namespace Sift.Client
             InitializeComponent();
 
             Lines = new List<Line>();
-            for (int i = 0; i < lines; i++)
+            for (byte i = 0; i < lines; i++)
                 Lines.Add(new Line(i));
 
             if (Role == Role.Screener)
@@ -67,19 +67,38 @@ namespace Sift.Client
 
             ConstructLineGrid(LineGrid, Lines, out elements);
             
-            Client.UpdateLineState += Client_UpdateLineState;
-            Client.UpdateSettings += Client_UpdateSettings;
-            Client.Send(new RequestLine(-1)); // request all lines
-            Client.Send(new RequestSettings()
+            Client.Manager.InitializeLine += Client_InitializeLine;
+            Client.Manager.LineMetadata += Client_LineMetadata;
+            Client.Manager.LineStateChanged += Client_LineStateChanged;
+            Client.Manager.Settings += Client_Settings;
+            /*Client.Send(new Settings()
             {
                 Key = "asterisk_hybrid_extensions",
                 Category = "asterisk",
-            });
+            });*/
 
             HasConnection = true;
         }
 
-        private void Client_UpdateSettings(object sender, UpdateSettings e)
+        private void Client_LineStateChanged(string id, LineStateChanged e)
+        {
+            if (e.Index >= Lines.Count)
+                return;
+
+            Line line = Lines[e.Index];
+            line.State = e.State;
+
+            if (e.State == LineState.Empty)
+            {
+                line.Caller = null;
+                if (Role == Role.Screener)
+                    Screener.Line = null;
+            }
+
+            elements[line].Update();
+        }
+
+        private void Client_Settings(string id, Settings e)
         {
             if (hybridsCreated || e.Key != "asterisk_hybrid_extensions" || e.Items.Count < 1)
                 return;
@@ -115,38 +134,41 @@ namespace Sift.Client
             return grid;
         }
 
-        private void Client_UpdateLineState(object sender, UpdateLineState e)
+        private void Client_InitializeLine(string id, InitializeLine e)
         {
             if (e.Index >= Lines.Count)
                 return;
 
             Line line = Lines[e.Index];
             line.State = e.State;
-
-            if (e.State == LineState.Empty)
-            {
-                line.Caller = null;
-                elements[line].Update();
-                if (Role == Role.Screener)
-                    Screener.Line = null;
-                return;
-            }
-
             if (line.Caller == null)
                 line.Caller = new Caller(e.Id);
 
             line.Caller.Number = e.Number;
-            line.Caller.Name = e.Name;
-            line.Caller.Location = e.Location;
-            line.Caller.Comment = e.Comment;
-
+            
             elements[line].Update();
 
             if (line == SelectedLine)
                 SelectLine(line);
         }
 
-        private void lineElementClick(object sender, MouseButtonEventArgs e)
+        private void Client_LineMetadata(string id, LineMetadata e)
+        {
+            if (e.Index >= Lines.Count)
+                return;
+
+            Line line = Lines[e.Index];
+            if (line.Caller == null)
+                return;
+
+            line.Caller.Name = e.Name;
+            line.Caller.Location = e.Location;
+            line.Caller.Comment = e.Comment;
+
+            elements[line].Update();
+        }
+
+        private void LineElementClick(object sender, MouseButtonEventArgs e)
         {
             LineElement line = (LineElement)sender;
             foreach (LineElement el in elements.Values)
@@ -182,9 +204,10 @@ namespace Sift.Client
                 {
                     if (col == 0)
                     {
-                        RowDefinition rowDef = new RowDefinition();
-                        rowDef.MaxHeight = maxHeight;
-                        g.RowDefinitions.Add(rowDef);
+                        g.RowDefinitions.Add(new RowDefinition
+                        {
+                            MaxHeight = maxHeight
+                        });
                     }
 
                     if (col * rows + row >= lines.Count)
@@ -192,12 +215,14 @@ namespace Sift.Client
 
                     Line line = lines[col * rows + row];
 
-                    LineElement el = new LineElement(this, line);
-                    el.Margin = new Thickness(5, 5, 0, 0);
-                    el.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    el.VerticalAlignment = VerticalAlignment.Stretch;
-                    el.MaxHeight = maxHeight;
-                    el.MouseLeftButtonUp += lineElementClick;
+                    LineElement el = new LineElement(this, line)
+                    {
+                        Margin = new Thickness(5, 5, 0, 0),
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        MaxHeight = maxHeight
+                    };
+                    el.MouseLeftButtonUp += LineElementClick;
 
                     Grid.SetRow(el, row);
                     Grid.SetColumn(el, col);
@@ -217,6 +242,32 @@ namespace Sift.Client
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
             new VoipProviderSettingsWindow(Client, provider).Show();
+        }
+
+        private void NetStatistics_Click(object sender, RoutedEventArgs e) { } /*new NetworkStatisticsWindow(Client.Client).Show()*/
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+                WindowState = WindowState.Normal;
+            else if (WindowState == WindowState.Normal)
+                WindowState = WindowState.Maximized;
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
         }
     }
 }

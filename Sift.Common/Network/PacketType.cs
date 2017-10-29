@@ -3,17 +3,19 @@
     public enum PacketType
     {
         UpdateAppState,
-        UpdateLineState,
+        InitializeLine,
 
         LoginRequest,
-        RequestDump,
-        RequestScreen,
-        RequestHold,
-        RequestLine,
-        RequestAir,
+        DumpLine,
+        ScreenLine,
+        HoldLine,
+        LineRequest,
+        AirLine,
 
         ErrorPacket,
         UpdateSettings,
         RequestSettings,
+        LineMetadata,
+        RemoveLine,
     }
 }

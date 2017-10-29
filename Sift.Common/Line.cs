@@ -2,7 +2,7 @@
 {
     public class Line
     {
-        public int Index { get; }
+        public byte Index { get; }
 
         private Caller caller;
 
@@ -23,7 +23,7 @@
 
         public LineState State { get; set; } = LineState.Empty;
 
-        public Line(int index)
+        public Line(byte index)
         {
             Index = index;
         }

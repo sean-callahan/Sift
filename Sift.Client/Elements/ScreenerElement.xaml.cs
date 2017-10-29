@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 
 using Sift.Common;
-using Sift.Common.Network;
+using Sift.Common.Net;
 
 namespace Sift.Client.Elements
 {
@@ -70,13 +70,12 @@ namespace Sift.Client.Elements
         {
             if (line == null || line.Caller == null)
                 return;
-
-            line.Caller.Number = Number.Text;
+            
             line.Caller.Name = CallerName.Text;
             line.Caller.Location = Location.Text;
             line.Caller.Comment = Comment.Text;
 
-            client.Send(new UpdateLineState(line));
+            client.Send(new LineMetadata(line));
         }
     }
 }

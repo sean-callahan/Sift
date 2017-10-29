@@ -1,10 +1,9 @@
-﻿using Lidgren.Network;
-
+﻿
 using Sift.Common.Util;
 
 namespace Sift.Common.Network
 {
-    public class NetworkUser : ICodec
+    /*public class NetworkUser : ICodec
     {
         public int Id { get; set; }
         public string Username { get; set; }
@@ -29,5 +28,5 @@ namespace Sift.Common.Network
             msg.Write(Username);
             msg.Write(encoded);
         }
-    }
+    }*/
 }

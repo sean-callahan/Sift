@@ -31,7 +31,7 @@ namespace Sift.Server
             }
         }
 
-        public static bool Login(NetworkUser netUser)
+        /*public static bool Login(NetworkUser netUser)
         {
             if (netUser == null || string.IsNullOrWhiteSpace(netUser.Username) || string.IsNullOrWhiteSpace(netUser.Password))
                 return false;
@@ -42,6 +42,6 @@ namespace Sift.Server
                     return false;
                 return BCrypt.Net.BCrypt.Verify(netUser.Password, user.PasswordHash);
             }
-        }
+        }*/
     }
 }

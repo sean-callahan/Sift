@@ -1,11 +1,9 @@
-﻿using Lidgren.Network;
-
-using Sift.Common.Network;
+﻿using Sift.Common.Network;
 using Sift.Common.Util;
 
 namespace Sift.Common
 {
-    public class User : ICodec
+    /*public class User : ICodec
     {
         public string Username { get; private set; }
         public string Hash { get; set; }
@@ -37,5 +35,5 @@ namespace Sift.Common
             msg.Write(Username);
             msg.Write(base64Password);
         }
-    }
+    }*/
 }

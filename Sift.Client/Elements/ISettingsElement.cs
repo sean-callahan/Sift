@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using Sift.Common.Network;
+using Sift.Common.Net;
 
 namespace Sift.Client.Elements
 {

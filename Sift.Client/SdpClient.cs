@@ -1,8 +1,12 @@
-﻿using Lidgren.Network;
+﻿using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
 
-namespace Sift.Common.Network
+using Sift.Common.Network;
+
+namespace Sift.Client
 {
-    public class SdpClient : PacketConsumer
+    /*public class SdpClient : PacketConsumer
     {
         protected override NetPeer Peer => Client;
 
@@ -16,7 +20,11 @@ namespace Sift.Common.Network
             config.AutoFlushSendQueue = true;
             config.ConnectionTimeout = 5.0f;
 
+            var context = new DispatcherSynchronizationContext(Application.Current.Dispatcher);
+            SynchronizationContext.SetSynchronizationContext(context);
+
             Client = new NetClient(config);
+            Client.RegisterReceivedCallback(new SendOrPostCallback(GotMessage));
             Client.Start();
         }
 
@@ -44,8 +52,8 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = Client.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            Client.SendMessage(msg, NetDeliveryMethod.Unreliable);
+            Client.SendMessage(msg, NetDeliveryMethod.ReliableUnordered);
             Client.FlushSendQueue();
         }
-    }
+    }*/
 }

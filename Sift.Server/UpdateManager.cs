@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using Sift.Common;
+using Sift.Common.Net;
 using Sift.Common.Network;
 using Sift.Server.Db;
 
@@ -17,13 +18,13 @@ namespace Sift.Server
         {
             Program = program;
 
-            Program.Server.UpdateLineState += Server_UpdateLineState;
-            Program.Server.UpdateSettings += Server_UpdateSettings;
+            Program.Server.Manager.LineMetadata += Server_LineMetadata;
+            //Program.Server.UpdateSettings += Server_UpdateSettings;
         }
 
         private static IFormatter formatter = new BinaryFormatter();
 
-        private void Server_UpdateSettings(object sender, UpdateSettings e)
+        private void Server_UpdateSettings(object sender, Settings e)
         {
             using (var ctx = new SettingContext())
             {
@@ -43,19 +44,17 @@ namespace Sift.Server
             }
         }
 
-        private void Server_UpdateLineState(object sender, UpdateLineState e)
+        private void Server_LineMetadata(string id, LineMetadata e)
         {
             Line line = Program.Lines[e.Index];
             if (line.Caller == null)
                 return;
-
-            line.State = e.State;
+            
             line.Caller.Name = e.Name;
             line.Caller.Location = e.Location;
             line.Caller.Comment = e.Comment;
-            line.Caller.Created = new DateTime().AddSeconds(e.Created);
 
-            Program.Server.Broadcast(new UpdateLineState(line));
+            Program.Server.Broadcast(new LineMetadata(line));
         }
     }
 }

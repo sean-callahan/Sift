@@ -1,9 +1,7 @@
-﻿using Lidgren.Network;
-
-namespace Sift.Common.Network
+﻿namespace Sift.Common.Network
 {
-    public interface IPacket : ICodec
+    /*public interface IPacket : ICodec
     {
         PacketType Type { get; } 
-    }
+    }*/
 }

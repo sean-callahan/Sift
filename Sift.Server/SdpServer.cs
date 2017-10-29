@@ -1,9 +1,11 @@
 ﻿using System.Net;
-using Lidgren.Network;
+using System.Threading;
 
-namespace Sift.Common.Network
+using Sift.Common.Network;
+
+namespace Sift.Server
 {
-    public class SdpServer : PacketConsumer
+    /*internal class SdpServer : PacketConsumer
     {
         private NetServer server;
 
@@ -16,7 +18,12 @@ namespace Sift.Common.Network
             config.Port = port;
             config.BroadcastAddress = IPAddress.Any;
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+
+            if (SynchronizationContext.Current == null)
+                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
             server = new NetServer(config);
+            server.RegisterReceivedCallback(new SendOrPostCallback(GotMessage));
         }
         
         public void Start() => server?.Start();
@@ -28,7 +35,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            server.SendToAll(msg, NetDeliveryMethod.Unreliable);
+            server.SendToAll(msg, NetDeliveryMethod.ReliableUnordered);
         }
 
         public void Send(NetConnection conn, IPacket packet)
@@ -38,7 +45,7 @@ namespace Sift.Common.Network
             NetOutgoingMessage msg = server.CreateMessage();
             msg.Write((byte)packet.Type);
             packet.Encode(msg);
-            server.SendMessage(msg, conn, NetDeliveryMethod.Unreliable);
+            server.SendMessage(msg, conn, NetDeliveryMethod.ReliableUnordered);
         }
-    }
+    }*/
 }

@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 
-using Lidgren.Network;
-
 namespace Sift.Common.Network
 {
-    public class UpdateSettings : IPacket
+    /*public class UpdateSettings : IPacket
     {
         public string Category { get; private set; }
 
@@ -45,5 +43,5 @@ namespace Sift.Common.Network
                 item.Encode(msg);
             }
         }
-    }
+    }*/
 }
