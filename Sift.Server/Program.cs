@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 using IniParser;
 using IniParser.Model;
+using JsonFlatFileDataStore;
 
 using Sift.Common;
 using Sift.Common.Net;
 using Sift.Server.Asterisk;
+using Sift.Server.Db;
 
 namespace Sift.Server
 {
@@ -54,7 +57,7 @@ namespace Sift.Server
 
         public SdpServer Server { get; }
 
-        public static DatabaseEngine Database { get; private set; }
+        public Dictionary<string, byte[]> Settings = new Dictionary<string, byte[]>();
 
         public Program()
         {
@@ -64,23 +67,29 @@ namespace Sift.Server
 
             Provider = VoipProviderFactory.Create(data["Provider"]);
 
-            Logger.Log("Loading database...");
-            try
+            if (!File.Exists(Setting.File))
             {
-                Database = new DatabaseEngine(data["Database"]);
-                Database.Initialize();
+                Setting.Save(Setting.Defaults);
             }
-            catch (Exception e)
+
+            foreach (Setting s in Setting.Get())
             {
-                Logger.Log("Could not connect to database.", Logger.Level.Error);
-                Logger.Log(e.InnerException);
-                return;
+                Settings.Add(s.Category + ":" + s.Key, s.Value);
             }
             
-            if (!LoginManager.UserExists("admin"))
+            Logger.Log("Loading database...");
+
+            try
             {
-                LoginManager.Create("admin", "changeme");
-                Logger.Log("Created 'admin' user account");
+                User.Store(new User
+                {
+                    Username = "admin",
+                    Hash = User.HashPassword("admin"),
+                });
+                Logger.Log("Added admin user");
+            }
+            catch (ArgumentException) {
+                // Admin user already added.
             }
 
             List<Line> lines = new List<Line>(numLines);

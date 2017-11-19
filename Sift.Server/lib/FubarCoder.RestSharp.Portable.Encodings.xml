@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FubarCoder.RestSharp.Portable.Encodings</name>
+    </assembly>
+    <members>
+        <member name="T:RestSharp.Portable.Encodings.DeflateEncoding">
+            <summary>
+            Handler for the "deflate" encoding
+            </summary>
+        </member>
+        <member name="M:RestSharp.Portable.Encodings.DeflateEncoding.Decode(System.Byte[])">
+            <summary>
+            Decode the content
+            </summary>
+            <param name="data">Content to decode</param>
+            <returns>Decoded content</returns>
+        </member>
+        <member name="M:RestSharp.Portable.Encodings.DeflateEncoding.DecodeStream(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="T:RestSharp.Portable.Encodings.GzipEncoding">
+            <summary>
+            GZIP content encoding handler
+            </summary>
+        </member>
+        <member name="M:RestSharp.Portable.Encodings.GzipEncoding.Decode(System.Byte[])">
+            <summary>
+            Decode the content
+            </summary>
+            <param name="data">Content to decode</param>
+            <returns>Decoded content</returns>
+        </member>
+        <member name="M:RestSharp.Portable.Encodings.GzipEncoding.DecodeStream(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

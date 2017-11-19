@@ -26,7 +26,7 @@ namespace Sift.Server
 
         private void Server_UpdateSettings(object sender, Settings e)
         {
-            using (var ctx = new SettingContext())
+            /*using (var ctx = new SettingContext())
             {
                 foreach (NetworkSetting net in e.Items)
                 {
@@ -41,7 +41,7 @@ namespace Sift.Server
                     
                 }
                 ctx.SaveChanges();
-            }
+            }*/
         }
 
         private void Server_LineMetadata(string id, LineMetadata e)

@@ -46,7 +46,7 @@ namespace Sift.Server
         {
             Logger.DebugLog("Requested settings " + (string.IsNullOrWhiteSpace(e.Key) ? "*" : e.Key) + " from " + (string.IsNullOrWhiteSpace(e.Category) ? "*" : e.Category));
             BinaryFormatter formatter = new BinaryFormatter();
-            using (var ctx = new SettingContext())
+            /*using (var ctx = new SettingContext())
             {
                 Setting[] settings;
                 bool hasCategory = !string.IsNullOrWhiteSpace(e.Category);
@@ -72,7 +72,7 @@ namespace Sift.Server
                     net[i] = new NetworkSetting(settings[i].Category, settings[i].Key, settings[i].Value);
                 }
                 //Program.Server.SendTo(id, new SettingsQuery());
-            }
+            }*/
         }
 
         /*private void Server_RequestUserLogin(NetworkUser user)
@@ -158,13 +158,9 @@ namespace Sift.Server
         private void Server_ScreenLine(string id, byte index)
         {
             Line line = Program.Lines[index];
-
             if (line.Caller == null || Program.LinkedCallers.ContainsKey(line.Caller))
                 return;
             
-            line.State = LineState.Screening;
-            Program.Server.Broadcast(new LineStateChanged(line));
-
             if (Program.LinkedCallers.ContainsKey(line.Caller))
             {
                 ILink existing = Program.LinkedCallers[line.Caller];
@@ -172,19 +168,19 @@ namespace Sift.Server
                 return;
             }
 
-            string exten;
-            using (var ctx = new SettingContext())
-            {
-                var item = ctx.Settings.Where(x => x.Key == "asterisk_screener_extension").FirstOrDefault();
-                if (item == null)
-                    return;
-                NetworkSetting setting = item.ToNetworkSetting();
-                exten = ((int)setting.Value).ToString();
-            }
+            if (!Program.Settings.TryGetValue("asterisk:screener_extension", out byte[] extenBytes))
+                return;
+
+            string exten = System.Text.Encoding.UTF8.GetString(extenBytes);
 
             ILink link = new AsteriskLink(Program, (AsteriskProvider)Program.Provider, Program.Lines[index].Caller, exten);
             link.Start();
-            
+
+
+            line.State = LineState.Screening;
+            Program.Server.Broadcast(new LineStateChanged(line));
+
+
             Program.LinkedCallers[line.Caller] = link;
         }
 
